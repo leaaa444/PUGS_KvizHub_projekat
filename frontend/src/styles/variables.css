@@ -1,0 +1,32 @@
+:root {
+  /* =========== PALETA BOJA =========== */ 
+  --foreground: #C89F9C;        
+  --background: #564154;   
+  --text-color: #EED7C5;
+  --button-color: #351431; 
+  
+  /*navbar colors*/
+  --navbar-background: #C89F9C; 
+  --navbar-logo: #351431; 
+  --navbar-text: #564154;       
+  --navbar-text-hover: #351431; 
+
+  --input-bg: #564154;
+  --input-text: #EED7C5;
+  --modal-text: #351431;
+
+  --danger: #a94442;
+  --danger-hover: #a21816;
+
+  /* =========== FONTOVI =========== */
+  --font-family-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-size-base: 16px;
+  --font-size-large: 1.25rem; /* 20px */
+  --font-size-small: 0.875rem; /* 14px */
+  --font-weight-normal: 400;
+  --font-weight-bold: 700;
+
+  /* =========== OSTALO =========== */
+  --border-radius: 8px;
+  --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

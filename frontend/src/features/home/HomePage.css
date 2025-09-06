@@ -1,0 +1,15 @@
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+  font-family: var(--font-family-main);
+
+}
+
+.home-buttons {
+  margin: 0 10px;
+}
+
