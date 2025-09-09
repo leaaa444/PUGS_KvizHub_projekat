@@ -22,38 +22,6 @@ namespace KvizHub.Api.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("KvizHub.Api.Mod.UserAnswer", b =>
-                {
-                    b.Property<int>("UserAnswerId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserAnswerId"));
-
-                    b.Property<string>("GivenTextAnswer")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("QuestionID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QuizResultID")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("SelectedAnswerOptionID")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserAnswerId");
-
-                    b.HasIndex("QuestionID");
-
-                    b.HasIndex("QuizResultID");
-
-                    b.HasIndex("SelectedAnswerOptionID");
-
-                    b.ToTable("UserAnswers");
-                });
-
             modelBuilder.Entity("KvizHub.Api.Models.AnswerOption", b =>
                 {
                     b.Property<int>("AnswerOptionID")
@@ -172,9 +140,6 @@ namespace KvizHub.Api.Migrations
                     b.Property<int>("CategoryID")
                         .HasColumnType("int");
 
-                    b.Property<int>("QuizCategoryID")
-                        .HasColumnType("int");
-
                     b.HasKey("QuizID", "CategoryID");
 
                     b.HasIndex("CategoryID");
@@ -255,29 +220,46 @@ namespace KvizHub.Api.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("KvizHub.Api.Mod.UserAnswer", b =>
+            modelBuilder.Entity("KvizHub.Api.Models.UserAnswer", b =>
                 {
-                    b.HasOne("KvizHub.Api.Models.Question", "Question")
-                        .WithMany()
-                        .HasForeignKey("QuestionID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.Property<int>("UserAnswerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.HasOne("KvizHub.Api.Models.QuizResult", "QuizResult")
-                        .WithMany("UserAnswers")
-                        .HasForeignKey("QuizResultID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserAnswerId"));
 
-                    b.HasOne("KvizHub.Api.Models.AnswerOption", "SelectedAnswerOption")
-                        .WithMany()
-                        .HasForeignKey("SelectedAnswerOptionID");
+                    b.Property<string>("GivenTextAnswer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Navigation("Question");
+                    b.Property<int>("QuestionID")
+                        .HasColumnType("int");
 
-                    b.Navigation("QuizResult");
+                    b.Property<int>("QuizResultID")
+                        .HasColumnType("int");
 
-                    b.Navigation("SelectedAnswerOption");
+                    b.HasKey("UserAnswerId");
+
+                    b.HasIndex("QuestionID");
+
+                    b.HasIndex("QuizResultID");
+
+                    b.ToTable("UserAnswers");
+                });
+
+            modelBuilder.Entity("KvizHub.Api.Models.UserAnswerSelectedOption", b =>
+                {
+                    b.Property<int>("UserAnswerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AnswerOptionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserAnswerId", "AnswerOptionId");
+
+                    b.HasIndex("AnswerOptionId");
+
+                    b.ToTable("UserAnswerSelectedOptions");
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.AnswerOption", b =>
@@ -340,6 +322,44 @@ namespace KvizHub.Api.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("KvizHub.Api.Models.UserAnswer", b =>
+                {
+                    b.HasOne("KvizHub.Api.Models.Question", "Question")
+                        .WithMany()
+                        .HasForeignKey("QuestionID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("KvizHub.Api.Models.QuizResult", "QuizResult")
+                        .WithMany("UserAnswers")
+                        .HasForeignKey("QuizResultID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
+
+                    b.Navigation("QuizResult");
+                });
+
+            modelBuilder.Entity("KvizHub.Api.Models.UserAnswerSelectedOption", b =>
+                {
+                    b.HasOne("KvizHub.Api.Models.AnswerOption", "AnswerOption")
+                        .WithMany()
+                        .HasForeignKey("AnswerOptionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("KvizHub.Api.Models.UserAnswer", "UserAnswer")
+                        .WithMany("SelectedOptions")
+                        .HasForeignKey("UserAnswerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AnswerOption");
+
+                    b.Navigation("UserAnswer");
+                });
+
             modelBuilder.Entity("KvizHub.Api.Models.Category", b =>
                 {
                     b.Navigation("QuizCategories");
@@ -367,6 +387,11 @@ namespace KvizHub.Api.Migrations
             modelBuilder.Entity("KvizHub.Api.Models.User", b =>
                 {
                     b.Navigation("QuizResults");
+                });
+
+            modelBuilder.Entity("KvizHub.Api.Models.UserAnswer", b =>
+                {
+                    b.Navigation("SelectedOptions");
                 });
 #pragma warning restore 612, 618
         }

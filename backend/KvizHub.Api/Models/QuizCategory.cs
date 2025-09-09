@@ -8,16 +8,13 @@ namespace KvizHub.Api.Models
 	public class QuizCategory
 	{
         [Key]
-		public int QuizCategoryID { get; set; }
-
-        [ForeignKey("Quiz")]
         public int QuizID { get; set; }
 
-        [ForeignKey("Category")]
+        [Key]
         public int CategoryID { get; set; }
 
-        public virtual required Quiz Quiz { get; set; }
+        public virtual Quiz Quiz { get; set; } = null!;
 
-        public virtual required Category Category { get; set; }
+        public virtual Category Category { get; set; } = null!;
     }
 }

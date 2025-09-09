@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace KvizHub.Api.Dtos
+namespace KvizHub.Api.Dtos.Auth
 {
     public class RegisterDto
     {
@@ -15,7 +15,6 @@ namespace KvizHub.Api.Dtos
         [MinLength(6)]
         public string Password { get; set; }  = string.Empty;
 
-        // Sliku za sada nećemo slati pri registraciji,
-        // korisnik je može dodati kasnije.
+      
     }
 }

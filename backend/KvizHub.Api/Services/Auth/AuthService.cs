@@ -33,7 +33,7 @@ namespace KvizHub.Api.Services.Auth
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower());
             if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.HashedPassword))
             {
-                return null; // Vraćamo null ako korisnik ne postoji ili je lozinka pogrešna
+                return null;
             }
 
             string token = CreateToken(user);

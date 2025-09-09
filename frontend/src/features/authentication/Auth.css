@@ -17,11 +17,11 @@
   margin-bottom: 2rem;
 }
 
-.form-group {
+.auth-form-group {
   margin-bottom: 1.5rem;
 }
 
-.form-group label {
+.auth-form-group label {
   display: block;
   margin-bottom: 8px;
   font-weight: var(--font-weight-bold);
@@ -29,7 +29,7 @@
   opacity: 0.8;
 }
 
-.form-group input {
+.auth-form-group input {
   width: 100%;
   padding: 10px;
   background-color: var(--input-bg);
@@ -40,7 +40,7 @@
   transition: all 0.2s ease-in-out;
 }
 
-.form-group input:focus {
+.auth-form-group input:focus {
   outline: none; 
   box-shadow: 0 0 10px var(--input-bg); 
 }
@@ -50,14 +50,14 @@
   margin-right: -1rem;
 }
 
-.form-footer {
+.auth-form-footer {
   display: flex;
   justify-content: space-between; 
   align-items: center;           
   margin-top: 1.5rem;
 }
 
-.form-message {
+.auth-form-message {
   flex-grow: 1; 
   padding-right: 15px;           
   margin-top: 1rem;

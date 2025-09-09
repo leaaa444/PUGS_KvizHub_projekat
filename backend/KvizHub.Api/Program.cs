@@ -1,31 +1,67 @@
 using KvizHub.Api.Data;
-using Microsoft.EntityFrameworkCore;
 using KvizHub.Api.Services.Auth;
+using KvizHub.Api.Services.Category;
+using KvizHub.Api.Services.Question;
+using KvizHub.Api.Services.Quizzes;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//baza
+var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: myAllowSpecificOrigins,
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:3000",      
+                               "http://192.168.1.4:3000")   
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 builder.Services.AddDbContext<KvizHubContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    }); 
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IQuizService, QuizService>();
+builder.Services.AddScoped<IQuestionService, QuestionService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddCors(options =>
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value!)),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
+
+builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AllowSpecificOrigin",
-        builder => builder.WithOrigins("http://localhost:3000")
-                          .AllowAnyHeader()
-                          .AllowAnyMethod());
+    options.AddPolicy("UserPolicy", policy => policy.RequireRole("User", "Admin"));
+    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
 });
 
-//auth
-builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
-app.UseCors("AllowSpecificOrigin");
 
 if (app.Environment.IsDevelopment())
 {
@@ -34,6 +70,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseCors(myAllowSpecificOrigins);
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

@@ -1,5 +1,4 @@
-﻿using KvizHub.Api.Mod;
-using KvizHub.Api.Models;
+﻿using KvizHub.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 
@@ -19,6 +18,22 @@ namespace KvizHub.Api.Data
             modelBuilder.Entity<QuizCategory>()
                 .HasKey(qc => new { qc.QuizID, qc.CategoryID });
 
+            modelBuilder.Entity<UserAnswerSelectedOption>()
+                .HasKey(e => new { e.UserAnswerId, e.AnswerOptionId });
+
+            modelBuilder.Entity<UserAnswer>()
+                .HasMany(ua => ua.SelectedOptions) // UserAnswer ima mnogo SelectedOptions
+                .WithOne(so => so.UserAnswer) // Svaki SelectedOption ima jedan UserAnswer
+                .HasForeignKey(so => so.UserAnswerId) // Spoljni ključ je UserAnswerId
+                .OnDelete(DeleteBehavior.Cascade); // Ako se obriše UserAnswer, obriši i unose u medjutabeli
+
+            modelBuilder.Entity<AnswerOption>()
+                .HasMany<UserAnswerSelectedOption>() // AnswerOption se nalazi u mnogo UserAnswerSelectedOption
+                .WithOne(so => so.AnswerOption) // Svaki SelectedOption ima jedan AnswerOption
+                .HasForeignKey(so => so.AnswerOptionId) // Spoljni ključ
+                .OnDelete(DeleteBehavior.Restrict); // ako se obriše opcija, ne radi ništa automatski
+
+
             // Prekidanje lanca kaskadnog brisanja
             // Kažemo da veza od Question ka UserAnswer ne radi automatsko brisanje
             modelBuilder.Entity<UserAnswer>()
@@ -37,5 +52,7 @@ namespace KvizHub.Api.Data
         public DbSet<QuizCategory> QuizCategories { get; set; }
         public DbSet<QuizResult> QuizResults { get; set; }
         public DbSet<UserAnswer> UserAnswers { get; set; }
+        public DbSet<UserAnswerSelectedOption> UserAnswerSelectedOptions { get; set; }
+
     }
 }

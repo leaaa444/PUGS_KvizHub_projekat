@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import authService from '../../services/authService';
+import { useAuth } from '../../context/AuthContext';
 import './Auth.css';
 
 interface RegisterFormProps {
-  onSuccess: () => void; // Funkcija koja će se pozvati nakon uspešne registracije
+  onSuccess: () => void; 
 }
 
 const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
@@ -13,6 +13,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
 
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -20,9 +21,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
     setMessage('');
 
     try {
-      await authService.register(username, email, password);
+      await register(username, email, password);
+
       onSuccess(); 
-      navigate('/kvizovi');  
+      navigate('/kvizovi');
+
     } catch (error: any) {
       const resMessage = error.response?.data || 'Došlo je do greške!';
       setMessage(resMessage);
@@ -34,7 +37,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
       <form onSubmit={handleRegister} className="auth-form">
         <h2>Registracija</h2>
         
-        <div className="form-group">
+        <div className="auth-form-group">
           <label htmlFor="username">Korisničko ime</label>
           <input
             type="text"
@@ -45,7 +48,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
           />
         </div>
 
-        <div className="form-group">
+        <div className="auth-form-group">
           <label htmlFor="email">Email</label>
           <input
             type="email"
@@ -56,7 +59,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
           />
         </div>
 
-        <div className="form-group">
+        <div className="auth-form-group">
           <label htmlFor="password">Lozinka</label>
           <input
             type="password"
@@ -68,8 +71,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
           />
         </div>
 
-        <div className="form-footer">
-            <div className="form-message">
+        <div className="auth-form-footer">
+            <div className="auth-form-message">
                 {message && (
                     <span className="alert-danger">{message}</span>
                 )}

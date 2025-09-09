@@ -1,22 +1,18 @@
 import React, {useState} from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import './Navbar.css';
 
 const Navbar = () => {
-  const navigate = useNavigate();
-
-  const token = localStorage.getItem('user_token');
-
+  const { user, logout } = useAuth();
   const [isDropdownOpen, setDropdownOpen] = useState(false);
 
-  if (!token) {
-    return null; 
+  if (!user) { 
+    return null;
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('user_token'); 
-    navigate('/'); 
-    window.location.reload(); 
+    logout();
   };
 
   return (
@@ -28,6 +24,9 @@ const Navbar = () => {
       <div className="navbar-links">
         <Link to="/kvizovi" className="navbar-links">Kvizovi</Link>
         <Link to="/rang-lista" className="navbar-links">Rang Lista</Link>
+        {user.role === 'Admin' && (
+          <Link to="/dashboard" className="navbar-links">Dashboard</Link>
+        )}
       </div>
 
       <div className="user-menu">

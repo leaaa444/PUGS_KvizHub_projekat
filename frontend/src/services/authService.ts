@@ -17,9 +17,10 @@ const login = (username: string, password: string) => {
   });
 };
 
+
 const authService = {
   register,
-  login,
+  login
 };
 
 export default authService;

@@ -4,7 +4,6 @@ using System.Text;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using KvizHub.Api.Models.Enums;
-using KvizHub.Api.Mod;
 
 namespace KvizHub.Api.Models
 {
@@ -28,7 +27,7 @@ namespace KvizHub.Api.Models
 
         public virtual List<AnswerOption> AnswerOptions { get; set; } = new();
 
-		public virtual required Quiz Quiz { get; set; }
+		public virtual Quiz Quiz { get; set; } = null!;
 
-	}
+    }
 }

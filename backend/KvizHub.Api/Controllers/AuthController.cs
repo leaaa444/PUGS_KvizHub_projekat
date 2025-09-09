@@ -1,7 +1,7 @@
-﻿using KvizHub.Api.Dtos;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using KvizHub.Api.Models;
 using KvizHub.Api.Services.Auth;
+using KvizHub.Api.Dtos.Auth;
 
 namespace KvizHub.Api.Controllers
 {
@@ -21,8 +21,8 @@ namespace KvizHub.Api.Controllers
         public async Task<IActionResult> Register(RegisterDto registerDto)
         {
             if (await _authService.UserExists(registerDto.Username))
-                return BadRequest("Username already exists."); 
-            
+                return BadRequest("Username already exists.");
+
             var userToCreate = new User
             {
                 Username = registerDto.Username,

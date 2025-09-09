@@ -6,7 +6,7 @@ import LoginForm from '../authentication/LoginForm';
 
 const HomePage = () => {
 
-    const [isRegisterModalOpen, setRegisterModalOpen] = useState(false);
+  const [isRegisterModalOpen, setRegisterModalOpen] = useState(false);
   const [isLoginModalOpen, setLoginModalOpen] = useState(false);
 
   return (
@@ -29,7 +29,6 @@ const HomePage = () => {
         <RegisterForm onSuccess={() => setRegisterModalOpen(false)} />
       </Modal>
 
-      {/* Login Modal (ovo je već bilo dobro) */}
       <Modal isOpen={isLoginModalOpen} onClose={() => setLoginModalOpen(false)}>
         <LoginForm onSuccess={() => setLoginModalOpen(false)} />
       </Modal>

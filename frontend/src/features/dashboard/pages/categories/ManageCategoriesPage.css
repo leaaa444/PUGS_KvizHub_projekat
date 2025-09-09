@@ -1,0 +1,48 @@
+.manage-categories-page {
+  padding: 1rem;
+}
+
+.add-category-form {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.add-category-form input {
+  flex-grow: 1;
+  padding: 10px;
+  background-color: var(--button-color);
+  border: 2px solid var(--background);
+  border-radius: var(--border-radius);
+  color: var(--text-color);
+  font-size: var(--font-size-base);
+}
+
+.add-category-form .btn {
+  background-color: var(--foreground);
+  color: var(--button-color);
+}
+
+.categories-list {
+  list-style: none;
+  padding: 0;
+}
+
+.categories-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: var(--background);
+  border-radius: var(--border-radius);
+  margin-bottom: 0.5rem;
+}
+
+.category-actions .btn-delete {
+  background-color: #a94442;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+}

@@ -18,7 +18,7 @@ namespace KvizHub.Api.Models
 
 		public bool IsCorrect { get; set; }
 
-		public virtual required Question Question { get; set; }
+		public virtual Question Question { get; set; } = null!;
 
-	}
+    }
 }

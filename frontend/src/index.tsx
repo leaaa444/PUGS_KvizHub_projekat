@@ -2,7 +2,15 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-import { BrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext'; 
+
+const router = createBrowserRouter([
+  {
+    path: "*", 
+    Component: App, 
+  },
+]);
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -10,9 +18,9 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+    <AuthProvider> 
+      <RouterProvider router={router} />
+    </AuthProvider>
   </React.StrictMode>
 );
 

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace KvizHub.Api.Mod
+namespace KvizHub.Api.Models
 {
 	public class UserAnswer
 	{
@@ -17,15 +17,14 @@ namespace KvizHub.Api.Mod
         [ForeignKey("Question")]
         public int QuestionID { get; set; }
 
-        [ForeignKey("SelectedAnswerOption")]
-        public int? SelectedAnswerOptionID { get; set; }
-
         public string GivenTextAnswer { get; set; } = string.Empty;
 
-        public virtual required QuizResult QuizResult { get; set; }
+        public virtual QuizResult QuizResult { get; set; } = null!;
 
-        public virtual required Question Question { get; set; }
+        public virtual Question Question { get; set; } = null!;
 
-        public virtual AnswerOption? SelectedAnswerOption { get; set; }
+        public virtual List<UserAnswerSelectedOption> SelectedOptions { get; set; } = new();
+
+
     }
 }

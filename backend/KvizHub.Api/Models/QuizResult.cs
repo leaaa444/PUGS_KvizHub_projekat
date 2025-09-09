@@ -1,4 +1,3 @@
-using KvizHub.Api.Mod;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -27,11 +26,11 @@ namespace KvizHub.Api.Models
 
         public int AttemptNum { get; set; }
 
-        public virtual required User User { get; set; }
+        public virtual User User { get; set; } = null!;
 
         public virtual List<UserAnswer> UserAnswers { get; set; } = new();
 
-        public virtual required Quiz Quiz { get; set; }
+        public virtual Quiz Quiz { get; set; } = null!;
 
     }
 }

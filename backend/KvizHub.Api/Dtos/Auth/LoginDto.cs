@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace KvizHub.Api.Dtos
+namespace KvizHub.Api.Dtos.Auth
 {
     public class LoginDto
     {

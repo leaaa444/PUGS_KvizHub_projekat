@@ -1,0 +1,87 @@
+.quiz-form-card {
+  margin-bottom: 2rem;
+}
+
+.quiz-form-card h3 {
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-color);
+}
+
+.quiz-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.quiz-form-group label {
+  font-weight: var(--font-weight-bold);
+  color: var(--text-color);
+  opacity: 0.9;
+}
+
+.quiz-form-group input,
+.quiz-form-group textarea,
+.quiz-form-group select {
+  width: 100%!;
+  padding: 12px;
+  background-color: var(--button-color);
+  border: 2px solid var(--background);
+  border-radius: var(--border-radius);
+  color: var(--text-color);
+  font-size: var(--font-size-base);
+  transition: all 0.2s ease-in-out;
+}
+
+.quiz-form-group select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%23EED7C5%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.23%207.21a.75.75%200%20011.06.02L10%2010.94l3.71-3.71a.75.75%200%20111.06%201.06l-4.25%204.25a.75.75%200%2001-1.06%200L5.21%208.27a.75.75%200%2001.02-1.06z%22%20clip-rule%3D%22evenodd%22%20/%3E%3C/svg%3E');
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  background-size: 1.2em 1.2em;
+  padding-right: 2.5rem;
+}
+
+.quiz-form-group input:focus,
+.quiz-form-group textarea:focus,
+.quiz-form-group select:focus {
+  outline: none;
+  border-color: var(--foreground);
+  box-shadow: 0 0 0 4px rgba(200, 159, 156, 0.5);
+}
+
+
+
+.react-select-container .react-select__control {
+  background-color: var(--button-color);
+  border: 2px solid var(--background);
+  border-radius: var(--border-radius);
+}
+.react-select-container .react-select__control--is-focused {
+  border-color: var(--foreground);
+  box-shadow: 0 0 0 1px var(--foreground);
+}
+.react-select-container .react-select__input-container,
+.react-select-container .react-select__single-value {
+  color: var(--text-color);
+}
+.react-select-container .react-select__menu {
+  background-color: var(--background);
+}
+.react-select-container .react-select__option {
+  background-color: var(--background);
+  color: var(--text-color);
+}
+.react-select-container .react-select__option--is-focused {
+  background-color: var(--button-color);
+}
+.react-select-container .react-select__multi-value {
+  background-color: var(--foreground);
+  color: var(--button-color);
+}
+.react-select-container .react-select__multi-value__label {
+  color: var(--button-color);
+}

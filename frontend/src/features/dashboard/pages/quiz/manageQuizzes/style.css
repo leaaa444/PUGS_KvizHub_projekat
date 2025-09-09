@@ -1,0 +1,47 @@
+.manage-page-container {
+  padding: 1rem;
+}
+
+.manage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.manage-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--background);
+}
+
+.manage-table th, .manage-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--button-color);
+  text-align: left;
+}
+
+.manage-table th {
+  background-color: var(--button-color);
+}
+
+.actions-cell {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-edit, .btn-delete {
+  border: none;
+  padding: 5px 10px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  color: white;
+}
+
+.btn-edit {
+  background-color: #007bff; /* Primer boje */
+}
+
+.btn-delete {
+  background-color: var(--danger);
+}
