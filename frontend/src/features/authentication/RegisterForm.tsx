@@ -13,15 +13,31 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
 
+  const [profilePicture, setProfilePicture] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
   const { register } = useAuth();
   const navigate = useNavigate();
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+          setProfilePicture(file);
+          setImagePreview(URL.createObjectURL(file));
+      }
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage('');
 
+    if (!profilePicture) {
+        setMessage('Molimo izaberite profilnu sliku.');
+        return;
+    }
+
     try {
-      await register(username, email, password);
+      await register(username, email, password, profilePicture);
 
       onSuccess(); 
       navigate('/kvizovi');
@@ -70,6 +86,23 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
             minLength={6}
           />
         </div>
+
+        <div className="auth-form-group">
+          <label htmlFor="profilePicture">Profilna slika</label>
+          <input
+            type="file"
+            id="profilePicture"
+            onChange={handleFileChange}
+            accept="image/png, image/jpeg" 
+            required
+          />
+        </div>
+
+        {imagePreview && (
+            <div className="image-preview-container">
+                <img src={imagePreview} alt="Pregled profilne slike" className="profile-image-preview" />
+            </div>
+        )}
 
         <div className="auth-form-footer">
             <div className="auth-form-message">

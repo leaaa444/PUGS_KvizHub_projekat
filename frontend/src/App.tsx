@@ -15,6 +15,7 @@ import ManageCategoriesPage from './features/dashboard/pages/categories/ManageCa
 import ViewResultsPage from './features/dashboard/pages/results/ViewResultsPage';
 import QuizBuilderPage from './features/dashboard/pages/quiz/quizbuilder/page';
 import QuizPage from './features/quiz/QuizPage';
+import QuizResultPage from './features/quizResult/QuizResultPage';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/" element={<PublicOnlyRoute><HomePage /></PublicOnlyRoute>} />
           <Route path="/kvizovi" element={<ProtectedRoute><QuizListPage /></ProtectedRoute>} />
           <Route path="/quiz/:quizId" element={<ProtectedRoute><QuizPage /></ProtectedRoute>} /> 
+          <Route path="/rezultati/:resultId" element={<ProtectedRoute><QuizResultPage /></ProtectedRoute>} /> 
           <Route path="/dashboard" element={<AdminRoute><DashboardLayout /></AdminRoute>}>
             <Route index element={<DashboardPage />} />
             <Route path="kvizovi" element={<ManageQuizzesPage />} />

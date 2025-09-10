@@ -12,18 +12,6 @@ export interface QuizListData {
   categories: string[]; 
 }
 
-interface AnswerSubmission {
-  questionId: number;
-  answerOptionIds: number[];
-  answerText: string | null;
-}
-
-interface QuizSubmission {
-  quizId: number;
-  timeTaken: number;
-  answers: AnswerSubmission[];
-}
-
 const getQuizzes = () => {
   return axios.get(API_URL, { headers: authHeader() });
 };
@@ -52,9 +40,6 @@ const updateQuiz = (id: number, quizData: any) => {
   return axios.put(API_URL + id, quizData, { headers: authHeader() });
 };
 
-const submitQuiz = (submissionData: QuizSubmission) => {
-  return axios.post(API_URL + 'submit', submissionData, { headers: authHeader() });
-};
 
 const quizService = {
   getQuizzes,
@@ -64,7 +49,6 @@ const quizService = {
   getQuizById,
   updateQuiz,
   getQuizForTaker,
-  submitQuiz,
 };
 
 export default quizService;

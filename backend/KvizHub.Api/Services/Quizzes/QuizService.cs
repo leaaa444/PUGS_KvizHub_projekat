@@ -3,7 +3,7 @@ using KvizHub.Api.Dtos.AnswerOption;
 using KvizHub.Api.Dtos.Category;
 using KvizHub.Api.Dtos.Question;
 using KvizHub.Api.Dtos.Quiz;
-using KvizHub.Api.Dtos.QuizResult;
+using KvizHub.Api.Dtos.Result;
 using KvizHub.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,6 +36,7 @@ namespace KvizHub.Api.Services.Quizzes
                     TimesCompleted = q.QuizResults.Count(),
                     MaxPoints = q.Questions.Sum(p => p.PointNum),
                     NumberOfQuestions = q.Questions.Count(),
+                    TimeLimit = q.TimeLimit,
                     Categories = q.QuizCategories.Select(qc => qc.Category.Name).ToList()
                 }).ToListAsync();
         }
@@ -315,99 +316,5 @@ namespace KvizHub.Api.Services.Quizzes
             return true;
         }
 
-        public async Task<QuizResultDto> SubmitQuizAsync(QuizSubmissionDto submissionDto, int userId)
-        {
-            var quiz = await _context.Quizzes
-                .Include(q => q.Questions)
-                    .ThenInclude(p => p.AnswerOptions)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(q => q.QuizID == submissionDto.QuizId);
-
-            if (quiz == null)
-            {
-                throw new KeyNotFoundException("Kviz nije pronađen.");
-            }
-
-            double totalScore = 0;
-            int correctAnswersCount = 0;
-            var userAnswersToSave = new List<UserAnswer>();
-
-            foreach (var userAnswerDto in submissionDto.Answers)
-            {
-                var question = quiz.Questions.FirstOrDefault(q => q.QuestionID == userAnswerDto.QuestionId);
-                if (question == null) continue;
-
-                bool isCorrect = false;
-
-                var userAnswer = new UserAnswer
-                {
-                    QuestionID = question.QuestionID,
-                };
-
-                switch (question.Type)
-                {
-                    case Models.Enums.QuestionType.SingleChoice:
-                    case Models.Enums.QuestionType.TrueFalse:
-                        var correctOptionId = question.AnswerOptions.FirstOrDefault(o => o.IsCorrect)?.AnswerOptionID;
-                        var userAnswerId = userAnswerDto.AnswerOptionIds.FirstOrDefault();
-
-                        isCorrect = userAnswerId == correctOptionId;
-                        if (userAnswerId > 0)
-                        {
-                            userAnswer.SelectedOptions.Add(new UserAnswerSelectedOption { AnswerOptionId = userAnswerId });
-                        }
-                        break;
-
-                    case Models.Enums.QuestionType.MultipleChoice:
-                        var correctOptionIds = question.AnswerOptions.Where(o => o.IsCorrect).Select(o => o.AnswerOptionID).ToHashSet();
-                        var userOptionIds = userAnswerDto.AnswerOptionIds.ToHashSet();
-
-                        isCorrect = correctOptionIds.SetEquals(userOptionIds);
-                        userAnswer.SelectedOptions = userAnswerDto.AnswerOptionIds
-                           .Select(id => new UserAnswerSelectedOption { AnswerOptionId = id })
-                           .ToList();
-                        break;
-
-                    case Models.Enums.QuestionType.FillInTheBlank:
-                        isCorrect = question.CorrectTextAnswer.Trim().Equals(userAnswerDto.AnswerText?.Trim(), StringComparison.OrdinalIgnoreCase);
-                        userAnswer.GivenTextAnswer = userAnswerDto.AnswerText ?? string.Empty;
-                        break;
-                }
-
-                if (isCorrect)
-                {
-                    totalScore += question.PointNum;
-                    correctAnswersCount++;
-                }
-
-                userAnswersToSave.Add(userAnswer);
-            }
-
-            int attemptNum = await _context.QuizResults
-                .CountAsync(r => r.QuizID == quiz.QuizID && r.UserID == userId) + 1;
-
-            var quizResult = new QuizResult
-            {
-                QuizID = quiz.QuizID,
-                UserID = userId,
-                Score = totalScore,
-                CorrectAnswers = correctAnswersCount,
-                DateOfCompletion = DateTime.UtcNow,
-                UserAnswers = userAnswersToSave,
-                AttemptNum = attemptNum,
-                CompletionTime = submissionDto.TimeTaken,
-            };
-            _context.QuizResults.Add(quizResult);
-            await _context.SaveChangesAsync();
-
-            return new QuizResultDto
-            {
-                ResultId = quizResult.QuizResultID,
-                QuizId = quiz.QuizID,
-                Score = quizResult.Score,
-                MaxPossibleScore = quiz.Questions.Sum(q => q.PointNum),
-                CorrectAnswers = correctAnswersCount
-            };
-        }
     }
 }

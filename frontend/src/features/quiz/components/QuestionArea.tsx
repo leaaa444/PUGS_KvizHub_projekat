@@ -6,7 +6,7 @@ interface QuestionAreaProps {
     currentQuestionIndex: number;
     totalQuestions: number;
     currentAnswer: any;
-    onAnswerChange: (questionId: number, value: any, type: number) => void;
+    onAnswerChange: (questionId: number, value: any, type: string) => void;
 }
 
 const QuestionArea: React.FC<QuestionAreaProps> = ({
@@ -22,7 +22,7 @@ const QuestionArea: React.FC<QuestionAreaProps> = ({
         </div>
         <h3>{currentQuestion.questionText}</h3>
         <div className="answer-options">
-            {currentQuestion.type === 3 ? (
+            {currentQuestion.type === 'FillInTheBlank' ? (
                 <input
                     type="text"
                     className="text-answer-input"
@@ -34,10 +34,10 @@ const QuestionArea: React.FC<QuestionAreaProps> = ({
                 currentQuestion.answerOptions.map(option => (
                     <label key={option.answerOptionId} className="answer-label">
                         <input
-                            type={currentQuestion.type === 1 ? 'checkbox' : 'radio'}
+                            type={currentQuestion.type === 'MultipleChoice' ? 'checkbox' : 'radio'}
                             name={`question-${currentQuestion.questionId}`}
                             checked={
-                                currentQuestion.type === 1
+                                currentQuestion.type === 'MultipleChoice'
                                     ? (currentAnswer as number[] | undefined)?.includes(option.answerOptionId) || false
                                     : currentAnswer === option.answerOptionId
                             }

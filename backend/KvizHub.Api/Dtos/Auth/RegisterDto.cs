@@ -15,6 +15,9 @@ namespace KvizHub.Api.Dtos.Auth
         [MinLength(6)]
         public string Password { get; set; }  = string.Empty;
 
-      
+        [Required(ErrorMessage = "Profilna slika je obavezna.")]
+        public IFormFile ProfilePicture { get; set; } = null!;
+
+
     }
 }

@@ -69,3 +69,41 @@
   font-weight: var(--font-weight-bold);
 }
 
+
+.image-preview-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.profile-image-preview {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%; /* Kružni oblik */
+    object-fit: cover; /* Osigurava da slika lepo popuni krug */
+    border: 3px solid var(--foreground);
+}
+
+/* Stil za file input da izgleda lepše */
+input[type="file"] {
+    color: var(--text-color);
+    padding: 10px;
+    border: 1px solid var(--background);
+    border-radius: 5px;
+    background-color: var(--input-bg);
+}
+
+input[type="file"]::file-selector-button {
+    margin-right: 15px;
+    border: none;
+    background: var(--foreground);
+    padding: 8px 12px;
+    border-radius: 5px;
+    color: var(--button-color);
+    cursor: pointer;
+    transition: background-color .2s ease-in-out;
+}
+
+input[type="file"]::file-selector-button:hover {
+    background-color: var(--text-color);
+}

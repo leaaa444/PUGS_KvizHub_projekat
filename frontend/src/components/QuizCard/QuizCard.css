@@ -1,109 +1,140 @@
 .quiz-card {
-  background-color: var(--button-color); /* Promenjeno */
-  border: 1px solid var(--background);     /* Promenjeno */
+  background-color: var(--button-color);
+  border: 1px solid var(--background);
   border-radius: var(--border-radius);
-  padding: 1.5rem;
+  box-shadow: var(--box-shadow);
   display: flex;
   flex-direction: column;
+  gap: 1rem; 
+  padding: 1.25rem;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  box-shadow: var(--box-shadow);
 }
 
 .quiz-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Senku možemo ostaviti jaču za hover efekat */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
 .quiz-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid var(--background); /* Promenjeno */
-  padding-bottom: 1rem;
-  margin-bottom: 1rem;
 }
 
 .quiz-card-header h3 {
   margin: 0;
-  font-size: var(--font-size-large);
+  font-size: 1.5rem; 
   color: var(--text-color);
 }
 
 .quiz-difficulty {
   font-weight: var(--font-weight-bold);
-  padding: 4px 10px;
-  border-radius: 15px; /* Ostavljeno zaobljenije za lepši izgled taga */
+  padding: 4px 12px;
+  border-radius: 50px;
   font-size: var(--font-size-small);
-  color: #fff; /* Ostavljena bela za bolji kontrast na bojama */
+  color: #fff;
   text-transform: capitalize;
 }
+
 
 /* Boje za nivoe težine (možete ih takođe prebaciti u varijable ako želite) */
 .difficulty-easy .quiz-difficulty { background-color: #28a745; }
 .difficulty-medium .quiz-difficulty { background-color: #ffc107; }
 .difficulty-hard .quiz-difficulty { background-color: #dc3545; }
-
 .quiz-card-categories {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-bottom: 1rem;
 }
 
 .category-tag {
-  background-color: var(--background); /* Promenjeno */
+  background-color: var(--background);
   color: var(--text-color);
-  padding: 4px 12px;
-  border-radius: 15px;
-  font-size: var(--font-size-small);
-  font-weight: var(--font-weight-bold);
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-size: var(--font-size-medium);
 }
 
+/* --- OPIS --- */
 .quiz-card-body {
-  flex-grow: 1;
+  flex-grow: 1; /* Gura sve ispod sebe na dno */
+  text-align: center;
+  /* Koristimo flex da savršeno vertikalno centriramo opis */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 70px; /* Minimalna visina da kartice budu ujednačene */
 }
 
 .quiz-card-body p {
-  color: var(--text-color);
-  min-height: 60px;
   margin: 0;
   font-size: var(--font-size-base);
+  color: var(--text-color);
+  opacity: 0.85; /* Blago smanjena vidljivost */
 }
 
+/* --- META PODACI (NOVO/AŽURIRANO) --- */
+.quiz-card-meta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--background);
+  border-bottom: 1px solid var(--background);
+  font-size: var(--font-size-medium);
+  opacity: 0.7;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* --- FOOTER --- */
 .quiz-card-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 1.5rem;
 }
 
 .quiz-points {
   font-size: var(--font-size-small);
   color: var(--text-color);
+  font-size: var(--font-size-medium);
 }
 
 .quiz-points strong {
-  font-size: 1.1rem; /* Ostavljeno malo veće radi naglašavanja */
-  color: var(--foreground); /* Promenjeno */
+  font-size: 1.1rem;
+  color: var(--foreground);
 }
 
 .btn-start-quiz {
-  background-color: var(--foreground); /* Promenjeno */
-  color: var(--button-color);         /* Promenjeno */
+  background-color: var(--foreground);
+  color: var(--button-color);
   border: none;
   padding: 10px 20px;
   border-radius: var(--border-radius);
   cursor: pointer;
   font-weight: var(--font-weight-bold);
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--font-size-medium);
 }
 
 .btn-start-quiz:hover {
-  background-color: var(--navbar-background); /* Koristi svetliju nijansu za hover */
+  background-color: var(--navbar-background);
   opacity: 0.9;
+}
+
+.btn-start-quiz:active {
+    transform: scale(0.98); /* Efekat klika */
 }
 
 .quiz-card.disabled {
   opacity: 0.5;
-  pointer-events: none; /* Sprečava sve klikove na karticu */
+  pointer-events: none;
 }

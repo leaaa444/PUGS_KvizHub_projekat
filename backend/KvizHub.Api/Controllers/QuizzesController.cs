@@ -1,6 +1,6 @@
 ﻿using KvizHub.Api.Dtos.Question;
 using KvizHub.Api.Dtos.Quiz;
-using KvizHub.Api.Dtos.QuizResult;
+using KvizHub.Api.Dtos.Result;
 using KvizHub.Api.Services.Question;
 using KvizHub.Api.Services.Quizzes;
 using Microsoft.AspNetCore.Authorization;
@@ -96,31 +96,6 @@ namespace KvizHub.Api.Controllers
             }
 
             return StatusCode(201, newQuestionDto);
-        }
-
-        [HttpPost("submit")]
-        public async Task<ActionResult<QuizResultDto>> SubmitQuiz([FromBody] QuizSubmissionDto submissionDto)
-        {
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (!int.TryParse(userIdString, out var userId))
-            {
-                return Unauthorized("User ID is missing or invalid in the token.");
-            }
-
-            try
-            {
-                var result = await _quizService.SubmitQuizAsync(submissionDto, userId);
-                return Ok(result);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Došlo je do interne greške prilikom obrade kviza.");
-            }
         }
 
         [HttpPut("{id}")]

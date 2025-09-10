@@ -6,7 +6,7 @@ export interface AnswerOption {
 export interface Question {
     questionId: number;
     questionText: string;
-    type: number; // 0=Jedan tačan, 1=Više tačnih, 3=Unos teksta
+    type: 'SingleChoice' | 'MultipleChoice' | 'FillInTheBlank' | 'TrueFalse';
     pointNum: number;
     answerOptions: AnswerOption[];
 }
@@ -17,6 +17,10 @@ export interface QuizData {
     timeLimit: number;
     questions: Question[];
 }
+
+export type UserAnswers = {
+  [key: number]: number | number[] | string | null; // Ključ je ID pitanja, vrednost može biti broj, niz brojeva ili tekst
+};
  
 export interface ResultData {
   resultId: number;

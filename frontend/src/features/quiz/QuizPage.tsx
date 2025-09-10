@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useBlocker } from 'react-router-dom';
-import quizService from '../../services/quizService';
+import resultService from '../../services/resultService';
 import { useQuizState } from './useQuizState';
 import './QuizPage.css';
 
@@ -15,7 +15,7 @@ const QuizPage: React.FC = () => {
     const navigate = useNavigate();
 
     const {
-        quizId, quizData, loading, timeLeft, userAnswers,
+        quizData, loading, timeLeft, userAnswers,
         currentQuestionIndex, setCurrentQuestionIndex, handleAnswerChange
     } = useQuizState();
     
@@ -25,8 +25,8 @@ const QuizPage: React.FC = () => {
     const [showExitConfirm, setShowExitConfirm] = useState(false);
 
     const blocker = useBlocker(() => !isResultModalOpen && timeLeft > 0);
-
-    const handleSubmit = useCallback(async () => {
+    
+    const handleSubmit = useCallback(async (options = { showResultsModal: true }) => {
         if (!quizData) return;
         
         const submissionDto = {
@@ -40,26 +40,31 @@ const QuizPage: React.FC = () => {
         };
 
          try {
-            const response = await quizService.submitQuiz(submissionDto);
-            ['activeQuizId', `quizEndTime_${quizId}`, `quizAnswers_${quizId}`, `quizLastIndex_${quizId}`]
-                .forEach(key => localStorage.removeItem(key));
-            
-            setResultData({
+            const response = await resultService.submitQuiz(submissionDto);
+            localStorage.removeItem('activeQuizState');
+
+            const resultDataResponse = {
                 ...response.data,
                 totalQuestions: quizData.questions.length
-            });
+            };
+            
+            setResultData(resultDataResponse);
 
+            sessionStorage.setItem('lastQuizResultId', resultDataResponse.resultId.toString());
+
+            if (options.showResultsModal) {
             setIsResultModalOpen(true);
+        }
         } catch (error) {
             console.error("Greška pri predaji kviza:", error);
             alert("Došlo je do greške prilikom predaje kviza.");
         }
-    }, [quizData, timeLeft, userAnswers, quizId]);
+    }, [quizData, timeLeft, userAnswers]);
 
     // Auto-submit on timer end
    useEffect(() => {
         if (timeLeft === 0 && !loading && quizData) {
-            handleSubmit();
+            handleSubmit({ showResultsModal: true });
         }
     }, [timeLeft, loading, quizData, handleSubmit]);
 
@@ -70,12 +75,13 @@ const QuizPage: React.FC = () => {
         }
     }, [blocker]);
 
-    const handleConfirmExit = async () => {
-        // Predaj kviz i dozvoli izlazak
-        await handleSubmit();
-        blocker.proceed?.(); // Dozvoli navigaciju
+   const handleConfirmExit = async () => {
+        setShowExitConfirm(false);
+        
+        blocker.reset?.();
+        
+        await handleSubmit({ showResultsModal: true });
     };
-
     const handleCancelExit = () => {
         // Poništi izlazak i zatvori modal
         setShowExitConfirm(false);
@@ -93,7 +99,7 @@ const QuizPage: React.FC = () => {
 
     const handleReview = () => {
         if (resultData) {
-            navigate(`/rezultati/${resultData.resultId}`);
+            navigate(`/rezultati/${resultData.resultId}`, { replace: true });
         }
     };
 
@@ -117,11 +123,11 @@ const QuizPage: React.FC = () => {
                     totalQuestions={quizData.questions.length}
                     onPrev={() => setCurrentQuestionIndex(prev => prev - 1)}
                     onNext={() => setCurrentQuestionIndex(prev => prev + 1)}
-                    onSubmit={handleSubmit}
+                    onSubmit={() => handleSubmit({ showResultsModal: true })}
                 />
             </div>
 
-            <Modal isOpen={isResultModalOpen} onClose={() => navigate('/kvizovi')}>
+            <Modal isOpen={isResultModalOpen} onClose={() => navigate('/kvizovi', { replace: true })}>
                 {resultData && (
                     <div className="quiz-result-content">
                         <h2>Kviz Predat!</h2>
@@ -153,7 +159,7 @@ const QuizPage: React.FC = () => {
                     <h3>Da li ste sigurni?</h3>
                     <p>Ako napustite stranicu, vaš kviz će biti automatski predat sa trenutnim odgovorima.</p>
                     <div className="modal-actions">
-                        <button onClick={handleConfirmExit} className="btn-confirm-exit">
+                        <button type="button" onClick={handleConfirmExit} className="btn-confirm-exit">
                             Da, predaj i izađi
                         </button>
                         <button onClick={handleCancelExit} className="btn-cancel-exit">

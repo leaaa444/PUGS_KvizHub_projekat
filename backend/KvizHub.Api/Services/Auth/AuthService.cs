@@ -1,4 +1,5 @@
 ﻿using KvizHub.Api.Data;
+using KvizHub.Api.Dtos.Auth;
 using KvizHub.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -12,11 +13,13 @@ namespace KvizHub.Api.Services.Auth
     {
         private readonly KvizHubContext _context;
         private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
-        public AuthService(KvizHubContext context, IConfiguration configuration)
+        public AuthService(KvizHubContext context, IConfiguration configuration, IWebHostEnvironment hostEnvironment)
         {
             _context = context;
             _configuration = configuration;
+            _hostEnvironment = hostEnvironment;
         }
 
         public async Task<bool> UserExists(string username)
@@ -40,9 +43,19 @@ namespace KvizHub.Api.Services.Auth
             return token;
         }
 
-        public async Task<User> Register(User user, string password)
+        public async Task<User> Register(RegisterDto registerDto)
         {
-            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
+            string profilePictureUrl = await SaveProfilePicture(registerDto.ProfilePicture);
+
+            var user = new User
+            {
+                Username = registerDto.Username,
+                Email = registerDto.Email,
+                ProfilePictureUrl = profilePictureUrl, 
+                UserRole = Models.Enums.UserRole.User
+            };
+
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
             user.HashedPassword = hashedPassword;
 
             await _context.Users.AddAsync(user);
@@ -50,6 +63,31 @@ namespace KvizHub.Api.Services.Auth
 
             return user;
         }
+
+        private async Task<string> SaveProfilePicture(IFormFile imageFile)
+        {
+            if (imageFile == null || imageFile.Length == 0)
+            {
+                throw new ArgumentException("Slika nije poslata.");
+            }
+
+            string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "ProfilePictures");
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            string uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await imageFile.CopyToAsync(fileStream);
+            }
+
+            return $"/ProfilePictures/{uniqueFileName}";
+        }
+
 
         private string CreateToken(User user)
         {
@@ -60,20 +98,23 @@ namespace KvizHub.Api.Services.Auth
                 new Claim(ClaimTypes.Role, user.UserRole.ToString())
             };
 
-            var appSettingsToken = _configuration.GetSection("AppSettings:Token").Value;
-            if (appSettingsToken is null)
-                throw new Exception("AppSettings Token is null!");
+            var keyString = _configuration.GetSection("Jwt:Key").Value;
+            if (string.IsNullOrEmpty(keyString))
+                throw new Exception("Jwt Key nije podešen u konfiguraciji!");
 
-            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8
-                .GetBytes(appSettingsToken));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
 
-            SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
+
+            var durationInMinutes = _configuration.GetValue<double>("Jwt:DurationInMinutes");
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddDays(1),
-                SigningCredentials = creds
+                Expires = DateTime.UtcNow.AddMinutes(durationInMinutes),
+                SigningCredentials = creds,
+                Issuer = _configuration.GetSection("Jwt:Issuer").Value,
+                Audience = _configuration.GetSection("Jwt:Audience").Value
             };
 
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();

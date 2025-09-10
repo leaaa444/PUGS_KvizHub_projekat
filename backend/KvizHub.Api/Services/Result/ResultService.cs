@@ -1,0 +1,188 @@
+﻿using KvizHub.Api.Data;
+using KvizHub.Api.Dtos.Quiz;
+using KvizHub.Api.Dtos.Result;
+using KvizHub.Api.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace KvizHub.Api.Services
+{
+    public class ResultService : IResultService
+    {
+        private readonly KvizHubContext _context;
+
+        public ResultService(KvizHubContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<QuizResultDetailsDto?> GetResultDetailsAsync(int resultId, string userId)
+        {
+            var resultEntity = await _context.QuizResults
+                .Where(qr => qr.QuizResultID == resultId && qr.User.UserID.ToString() == userId)
+                .Include(qr => qr.Quiz)
+                    .ThenInclude(q => q.Questions)
+                        .ThenInclude(qu => qu.AnswerOptions)
+                .Include(qr => qr.UserAnswers)
+                    .ThenInclude(ua => ua.SelectedOptions)
+                .FirstOrDefaultAsync();
+
+            if (resultEntity == null)
+            {
+                return null;
+            }
+
+
+            var resultDto = new QuizResultDetailsDto
+            {
+                ResultId = resultEntity.QuizResultID,
+                QuizName = resultEntity.Quiz.Name,
+                Score = resultEntity.Score,
+                MaxPossibleScore = resultEntity.Quiz.Questions.Sum(q => q.PointNum),
+                DateCompleted = resultEntity.DateOfCompletion,
+                TimeTaken = resultEntity.CompletionTime,
+                Questions = resultEntity.Quiz.Questions.Select(q =>
+                {
+                    // Pronalazimo korisnikov odgovor za ovo konkretno pitanje
+                    var userAnswer = resultEntity.UserAnswers.FirstOrDefault(ua => ua.QuestionID == q.QuestionID);
+
+                    return new QuestionResultDto
+                    {
+                        QuestionId = q.QuestionID,
+                        Text = q.QuestionText,
+                        Type = q.Type,
+                        Options = q.AnswerOptions.Select(opt => new OptionResultDto
+                        {
+                            OptionId = opt.AnswerOptionID,
+                            Text = opt.Text
+                        }).ToList(),
+                        CorrectAnswer = new CorrectAnswerResultDto
+                        {
+                            AnswerOptionIds = q.AnswerOptions.Where(opt => opt.IsCorrect).Select(opt => opt.AnswerOptionID).ToList(),
+                            AnswerText = q.CorrectTextAnswer
+                        },
+                        UserAnswer = userAnswer != null ? new UserAnswerResultDto
+                        {
+                            AnswerText = userAnswer.GivenTextAnswer,
+                            AnswerOptionIds = userAnswer.SelectedOptions.Select(so => so.AnswerOptionId).ToList()
+                        } : new UserAnswerResultDto(), // Ako nema odgovora, vrati prazan objekat
+                                                       // Sada bezbedno pozivamo našu C# metodu
+                        IsCorrect = userAnswer != null && IsAnswerCorrect(userAnswer, q)
+                    };
+                }).ToList()
+            };
+
+            return resultDto;
+        }
+
+        // Helper funkcija za proveru tačnosti odgovora
+        private static bool IsAnswerCorrect(Models.UserAnswer userAnswer, Models.Question question)
+        {
+            if (question.Type == Models.Enums.QuestionType.FillInTheBlank)
+            {
+                return userAnswer.GivenTextAnswer?.Trim().Equals(question.CorrectTextAnswer?.Trim(), StringComparison.OrdinalIgnoreCase) ?? false;
+            }
+            else
+            {
+                var correctOptionIds = question.AnswerOptions.Where(o => o.IsCorrect).Select(o => o.AnswerOptionID).ToHashSet();
+                var selectedOptionIds = userAnswer.SelectedOptions.Select(so => so.AnswerOptionId).ToHashSet();
+                return correctOptionIds.SetEquals(selectedOptionIds);
+            }
+        }
+
+        public async Task<QuizResultDto> SubmitQuizAsync(QuizSubmissionDto submissionDto, int userId)
+        {
+            var quiz = await _context.Quizzes
+                .Include(q => q.Questions)
+                    .ThenInclude(p => p.AnswerOptions)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(q => q.QuizID == submissionDto.QuizId);
+
+            if (quiz == null)
+            {
+                throw new KeyNotFoundException("Kviz nije pronađen.");
+            }
+
+            double totalScore = 0;
+            int correctAnswersCount = 0;
+            var userAnswersToSave = new List<UserAnswer>();
+
+            foreach (var userAnswerDto in submissionDto.Answers)
+            {
+                var question = quiz.Questions.FirstOrDefault(q => q.QuestionID == userAnswerDto.QuestionId);
+                if (question == null) continue;
+
+                bool isCorrect = false;
+
+                var userAnswer = new UserAnswer
+                {
+                    QuestionID = question.QuestionID,
+                };
+
+                switch (question.Type)
+                {
+                    case Models.Enums.QuestionType.SingleChoice:
+                    case Models.Enums.QuestionType.TrueFalse:
+                        var correctOptionId = question.AnswerOptions.FirstOrDefault(o => o.IsCorrect)?.AnswerOptionID;
+                        var userAnswerId = userAnswerDto.AnswerOptionIds.FirstOrDefault();
+
+                        isCorrect = userAnswerId == correctOptionId;
+                        if (userAnswerId > 0)
+                        {
+                            userAnswer.SelectedOptions.Add(new UserAnswerSelectedOption { AnswerOptionId = userAnswerId });
+                        }
+                        break;
+
+                    case Models.Enums.QuestionType.MultipleChoice:
+                        var correctOptionIds = question.AnswerOptions.Where(o => o.IsCorrect).Select(o => o.AnswerOptionID).ToHashSet();
+                        var userOptionIds = userAnswerDto.AnswerOptionIds.ToHashSet();
+
+                        isCorrect = correctOptionIds.SetEquals(userOptionIds);
+                        userAnswer.SelectedOptions = userAnswerDto.AnswerOptionIds
+                           .Select(id => new UserAnswerSelectedOption { AnswerOptionId = id })
+                           .ToList();
+                        break;
+
+                    case Models.Enums.QuestionType.FillInTheBlank:
+                        isCorrect = question.CorrectTextAnswer.Trim().Equals(userAnswerDto.AnswerText?.Trim(), StringComparison.OrdinalIgnoreCase);
+                        userAnswer.GivenTextAnswer = userAnswerDto.AnswerText ?? string.Empty;
+                        break;
+                }
+
+                if (isCorrect)
+                {
+                    totalScore += question.PointNum;
+                    correctAnswersCount++;
+                }
+
+                userAnswersToSave.Add(userAnswer);
+            }
+
+            int attemptNum = await _context.QuizResults
+                .CountAsync(r => r.QuizID == quiz.QuizID && r.UserID == userId) + 1;
+
+            var quizResult = new QuizResult
+            {
+                QuizID = quiz.QuizID,
+                UserID = userId,
+                Score = totalScore,
+                CorrectAnswers = correctAnswersCount,
+                DateOfCompletion = DateTime.UtcNow,
+                UserAnswers = userAnswersToSave,
+                AttemptNum = attemptNum,
+                CompletionTime = submissionDto.TimeTaken,
+            };
+            _context.QuizResults.Add(quizResult);
+            await _context.SaveChangesAsync();
+
+            return new QuizResultDto
+            {
+                ResultId = quizResult.QuizResultID,
+                QuizId = quiz.QuizID,
+                Score = quizResult.Score,
+                MaxPossibleScore = quiz.Questions.Sum(q => q.PointNum),
+                CorrectAnswers = correctAnswersCount
+            };
+        }
+
+    }
+}

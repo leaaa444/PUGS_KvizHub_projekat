@@ -1,4 +1,4 @@
-﻿namespace KvizHub.Api.Dtos.QuizResult
+﻿namespace KvizHub.Api.Dtos.Result
 {
     public class QuizResultDto
     {

@@ -18,20 +18,25 @@ namespace KvizHub.Api.Controllers
 
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterDto registerDto)
+        public async Task<IActionResult> Register([FromForm] RegisterDto registerDto)
         {
             if (await _authService.UserExists(registerDto.Username))
-                return BadRequest("Username already exists.");
+                return BadRequest("Korisničko ime već postoji.");
 
-            var userToCreate = new User
+            try
             {
-                Username = registerDto.Username,
-                Email = registerDto.Email,
-                UserRole = Models.Enums.UserRole.User
-            };
-
-            var createdUser = await _authService.Register(userToCreate, registerDto.Password);
-            return StatusCode(201); // 201 Created
+                await _authService.Register(registerDto);
+                return StatusCode(201, new { message = "Korisnik uspešno registrovan." });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                // Generalna greška za slučaj da nešto drugo krene po zlu (npr. problem sa čuvanjem fajla)
+                return StatusCode(500, new { message = "Došlo je do greške na serveru." });
+            }
         }
 
         [HttpPost("login")]

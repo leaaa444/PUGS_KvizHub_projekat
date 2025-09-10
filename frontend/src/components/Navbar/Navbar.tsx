@@ -12,6 +12,7 @@ const Navbar = () => {
   }
 
   const handleLogout = () => {
+    setDropdownOpen(false);
     logout();
   };
 

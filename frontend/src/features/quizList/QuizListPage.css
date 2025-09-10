@@ -2,15 +2,15 @@
   padding: 2rem 4rem;
   max-width: 1400px;
   margin: 0 auto;
-  color: #f0f0f0;
+  color: var(--text-color); /* Korišćenje varijable za boju teksta */
 }
 
 .quiz-list-container h1 {
   font-size: 2.5rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold); /* Korišćenje varijable za debljinu fonta */
   text-align: center;
   margin-bottom: 0.5rem;
-  color: #fff;
+  color: var(--text-color); /* Glavna boja teksta */
 }
 
 .quiz-list-container h2 {
@@ -20,19 +20,72 @@
 
 .quiz-list-container p {
   text-align: center;
-  font-size: 1.2rem;
-  color: #ccc;
+  font-size: var(--font-size-large); /* Korišćenje varijable za veličinu fonta */
+  color: var(--text-color);
+  opacity: 0.8; /* Blago smanjena vidljivost za podnaslov */
   margin-bottom: 3rem;
 }
 
 .quiz-grid {
   display: grid;
-  /* Kreira kolone koje su široke najmanje 350px, a najviše 1fr (jednako dele prostor) */
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 2rem; /* Razmak između kartica */
+  gap: 2rem;
 }
 
 .error-message {
-  color: #dc3545; /* Crvena boja za greške */
+  color: var(--danger); /* Korišćenje varijable za boju greške */
   text-align: center;
+}
+
+/* Redizajniran filter kontejner */
+.filter-container {
+  display: flex;
+  gap: 1rem; /* Ažuriran razmak */
+  margin: 0 auto 3rem auto; /* Centriran i sa donjom marginom */
+  padding: 1rem;
+  background-color: var(--foreground); /* Korišćenje varijable za pozadinu */
+  border-radius: var(--border-radius); /* Korišćenje varijable za radijus */
+  box-shadow: var(--box-shadow); /* Korišćenje varijable za senku */
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 70%;
+}
+
+.filter-search
+{
+  width: 300px;
+}
+
+
+.filter-search, .filter-select {
+  padding: 12px 15px;
+  border: 1px solid transparent; /* Uklonjen standardni border */
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-base);
+  background-color: var(--input-bg); /* Korišćenje varijable za pozadinu inputa */
+  color: var(--input-text); /* Korišćenje varijable za boju teksta inputa */
+  min-width: 220px;
+  transition: border-color 0.2s ease-in-out; /* Glatka tranzicija za fokus */
+}
+
+/* Uklanjanje default strelice za select i dodavanje custom */
+.filter-select {
+  appearance: none;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23EED7C5%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+  background-repeat: no-repeat;
+  background-position: right 15px top 50%;
+  background-size: 10px auto;
+  padding-right: 40px; /* Dodatni padding za prostor za strelicu */
+}
+
+.filter-search::placeholder {
+  color: var(--text-color);
+  opacity: 0.6;
+}
+
+/* Novi focus efekat koji je u skladu sa temom */
+.filter-search:focus, .filter-select:focus {
+  outline: none;
+  border-color: var(--text-color); /* Border u boji teksta umesto plavog shadow-a */
+  box-shadow: none; /* Uklanjanje default browser shadow-a */
 }

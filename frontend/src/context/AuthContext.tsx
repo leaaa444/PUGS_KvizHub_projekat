@@ -11,7 +11,7 @@ interface AuthContextType {
   user: User | null;
   login: (username: string, password: string) => Promise<void>;
   loading: boolean;
-  register: (username: string, email: string, password: string) => Promise<void>;
+  register: (username: string, email: string, password: string, profilePicture: File) => Promise<void>;
   logout: () => void;
   token: string | null;
 }
@@ -33,20 +33,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             role: decodedUser.role 
           });
         } else {
-          localStorage.removeItem('user_token');
-          setToken(null);
+          logout();
         }
       }
     } catch (e) {
-      localStorage.removeItem('user_token');
-      setToken(null);
+      logout();
     } finally {
       setLoading(false); 
     }
   }, [token]);
 
-  const register = async (username: string, email: string, password: string) => {
-    await authService.register(username, email, password);
+    const register = async (username: string, email: string, password: string, profilePicture: File) => {
+    await authService.register(username, email, password, profilePicture);
     await login(username, password); 
   };
 

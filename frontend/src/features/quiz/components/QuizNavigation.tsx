@@ -20,7 +20,7 @@ const QuizNavigation: React.FC<QuizNavigationProps> = ({
             Prethodno
         </button>
         {currentQuestionIndex === totalQuestions - 1 ? (
-            <button onClick={onSubmit} className="finish-btn">
+            <button type="button" onClick={onSubmit} className="finish-btn">
                 Završi Kviz
             </button>
         ) : (

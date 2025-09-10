@@ -9,6 +9,7 @@
         public int TimesCompleted { get; set; }
         public double MaxPoints { get; set; }
         public int NumberOfQuestions { get; set; }
+        public int TimeLimit { get; set; }
         public List<string> Categories { get; set; } = new();
     }
 }

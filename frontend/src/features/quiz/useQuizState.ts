@@ -1,72 +1,102 @@
 // src/hooks/useQuizState.ts
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import quizService from '../../services/quizService';
-import { QuizData } from './types';
+import { QuizData, UserAnswers } from './types';
 
-// Funkcija za inicijalizaciju stanja iz localStorage-a
-const getInitialState = <T>(key: string, defaultValue: T): T => {
-    const savedValue = localStorage.getItem(key);
-    if (savedValue) {
-        try {
-            return JSON.parse(savedValue);
-        } catch (e) {
-            return savedValue as T;
+// Stanje koje čuvamo u localStorage
+interface ActiveQuizState  {
+    quizId: number;
+    userAnswers: UserAnswers;
+    endTime: number;
+    currentQuestionIndex: number;
+}
+
+// Nova funkcija koja čita stanje iz jednog ključa
+const getInitialState = (quizId: number): ActiveQuizState  | null => {
+    const savedStateJSON = localStorage.getItem('activeQuizState');
+    if (!savedStateJSON) return null;
+
+    try {
+        const savedState: ActiveQuizState  = JSON.parse(savedStateJSON);
+        if (savedState.quizId === quizId) {
+            if (savedState.endTime > Date.now()) {
+                return savedState;
+            }
         }
+        // Ako je sačuvan neki drugi kviz, brišemo ga
+        localStorage.removeItem('activeQuizState');
+        return null;
+    } catch (e) {
+        localStorage.removeItem('activeQuizState');
+        return null;
     }
-    return defaultValue;
 };
 
 export const useQuizState = () => {
-    const { quizId } = useParams<{ quizId: string }>();
+    const { quizId: quizIdParam } = useParams<{ quizId: string }>();
+    const quizId = Number(quizIdParam);
     const navigate = useNavigate();
 
     const [quizData, setQuizData] = useState<QuizData | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-    const [timeLeft, setTimeLeft] = useState<number>(0);
-    
-    const [userAnswers, setUserAnswers] = useState<{ [key: number]: any }>(() => 
-        getInitialState(`quizAnswers_${quizId}`, {})
-    );
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(() => 
-        parseInt(getInitialState(`quizLastIndex_${quizId}`, '0'), 10)
-    );
 
+    const initialState = useMemo(() => getInitialState(quizId), [quizId]);
+    
+    const [userAnswers, setUserAnswers] = useState<UserAnswers>(initialState?.userAnswers || {});
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(initialState?.currentQuestionIndex || 0);
+    const [timeLeft, setTimeLeft] = useState<number>(initialState ? Math.round((initialState.endTime - Date.now()) / 1000) : 0);
+    
+    // za inicijalizaciju kviza
     useEffect(() => {
         if (!quizId) return;
-        const timerKey = `quizEndTime_${quizId}`;
-        const savedEndTime = localStorage.getItem(timerKey);
 
-        quizService.getQuizForTaker(parseInt(quizId))
+        quizService.getQuizForTaker(quizId)
             .then(response => {
-                setQuizData(response.data);
-                if (savedEndTime) {
-                    const endTime = parseInt(savedEndTime, 10);
-                    const remaining = Math.max(0, Math.round((endTime - Date.now()) / 1000));
-                    setTimeLeft(remaining);
-                } else {
-                    const timeLimit = response.data.timeLimit;
-                    const endTime = Date.now() + timeLimit * 1000;
-                    localStorage.setItem(timerKey, endTime.toString());
-                    setTimeLeft(timeLimit);
+                const fetchedQuizData = response.data;
+                setQuizData(fetchedQuizData);
+
+                if (!initialState) {
+                    const endTime = Date.now() + fetchedQuizData.timeLimit * 1000;
+                    setTimeLeft(fetchedQuizData.timeLimit);
+                    
+                    // Kreiramo i čuvamo ceo 'activeQuizState' objekat odjednom
+                    const newState: ActiveQuizState = {
+                        quizId: quizId,
+                        userAnswers: {},
+                        currentQuestionIndex: 0,
+                        endTime: endTime
+                    };
+                    localStorage.setItem('activeQuizState', JSON.stringify(newState));
                 }
-                localStorage.setItem('activeQuizId', quizId);
                 setLoading(false);
+
             })
             .catch(error => {
-                console.error("Error fetching quiz:", error);
+                console.error("Greška pri preuzimanju kviza:", error);
                 navigate('/kvizovi');
             });
-    }, [quizId, navigate]);
+    }, [quizId, navigate, initialState]);
 
-    // Efekti za čuvanje stanja u localStorage
-    useEffect(() => {
-        if (quizId) localStorage.setItem(`quizAnswers_${quizId}`, JSON.stringify(userAnswers));
-    }, [userAnswers, quizId]);
+    // za čuvanje kompletnog napretka
+     useEffect(() => {
+        if (loading) return;
 
-    useEffect(() => {
-        if (quizId) localStorage.setItem(`quizLastIndex_${quizId}`, currentQuestionIndex.toString());
-    }, [currentQuestionIndex, quizId]);
+        const currentStateJSON = localStorage.getItem('activeQuizState');
+        if (currentStateJSON) {
+            try {
+                const currentState: ActiveQuizState = JSON.parse(currentStateJSON);
+                const newState: ActiveQuizState = {
+                    ...currentState,
+                    userAnswers,
+                    currentQuestionIndex
+                };
+                localStorage.setItem('activeQuizState', JSON.stringify(newState));
+            } catch (e) {
+                console.error("Greška pri čuvanju stanja kviza:", e);
+            }
+        }
+    }, [userAnswers, currentQuestionIndex, loading]);
 
     // Timer logic
     useEffect(() => {
@@ -75,20 +105,25 @@ export const useQuizState = () => {
         return () => clearInterval(timerId);
     }, [timeLeft, loading]);
 
-    const handleAnswerChange = useCallback((questionId: number, answerValue: any, questionType: number) => {
-        setUserAnswers(prev => {
-            const newAnswers = { ...prev };
-            if (questionType === 1) { // Više tačnih
-                const selection = (newAnswers[questionId] as number[] | undefined) || [];
-                newAnswers[questionId] = selection.includes(answerValue)
-                    ? selection.filter(id => id !== answerValue)
-                    : [...selection, answerValue];
+    const handleAnswerChange = useCallback((questionId: number, answerValue: any, questionType: string) => {
+    setUserAnswers(prev => {
+        const newAnswers = { ...prev };
+
+        if (questionType === 'MultipleChoice') {
+            const currentSelection = (newAnswers[questionId] as number[] | undefined) || [];
+            
+            if (currentSelection.includes(answerValue)) {
+                newAnswers[questionId] = currentSelection.filter(id => id !== answerValue);
             } else {
-                newAnswers[questionId] = answerValue;
+                newAnswers[questionId] = [...currentSelection, answerValue];
             }
-            return newAnswers;
-        });
-    }, []);
+        } else {
+            newAnswers[questionId] = answerValue;
+        }
+
+        return newAnswers;
+    });
+}, []);
     
     return {
         quizId,
