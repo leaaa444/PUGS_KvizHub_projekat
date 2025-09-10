@@ -416,4 +416,5 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
-backend/KvizHub.Api/appsettings.json
+backend/KvizHub.Api/appsettings.Development.json
+backend/KvizHub.Api/appsettings.Development.json
