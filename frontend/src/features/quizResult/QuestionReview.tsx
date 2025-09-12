@@ -20,11 +20,15 @@ const QuestionReview: React.FC<QuestionReviewProps> = ({ question, index }) => {
         return 'option';
     };
 
+
     return (
         <div className="question-review-card">
             <div className={`question-header`}>
                 <h4>{index}. {question.text}</h4>
-                    {question.userAnswer.answerOptionIds.length === 0 && (
+                    {(question.userAnswer.answerOptionIds.length === 0 && question.type !== 'FillInTheBlank') && (
+                        <p className="not-answered-message">Niste odgovorili na ovo pitanje.</p>
+                    )}
+                    {(question.userAnswer.answerText === null && question.type === 'FillInTheBlank') && (
                         <p className="not-answered-message">Niste odgovorili na ovo pitanje.</p>
                     )}
                 <span className={`question-status-tag ${question.isCorrect ? 'correct' : 'incorrect'}`}>

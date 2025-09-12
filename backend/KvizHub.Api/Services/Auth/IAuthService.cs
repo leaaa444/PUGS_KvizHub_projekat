@@ -7,7 +7,8 @@ namespace KvizHub.Api.Services.Auth
     public interface IAuthService
     {
         Task<User> Register(RegisterDto registerDto);
-        Task<string?> Login(string username, string password);
+        Task<string?> Login(string loginIdentifier, string password);
         Task<bool> UserExists(string username);
+        Task<bool> EmailExists(string email);
     }
 }

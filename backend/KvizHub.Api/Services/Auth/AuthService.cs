@@ -31,9 +31,21 @@ namespace KvizHub.Api.Services.Auth
             return false;
         }
 
-        public async Task<string?> Login(string username, string password)
+        public async Task<bool> EmailExists(string email)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower());
+            if (await _context.Users.AnyAsync(u => u.Email.ToLower() == email.ToLower()))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<string?> Login(string loginIdentifier, string password)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u =>
+                u.Username.ToLower() == loginIdentifier.ToLower() ||
+                u.Email.ToLower() == loginIdentifier.ToLower()
+            );
             if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.HashedPassword))
             {
                 return null;
@@ -77,7 +89,8 @@ namespace KvizHub.Api.Services.Auth
                 Directory.CreateDirectory(uploadsFolder);
             }
 
-            string uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+            string fileExtension = Path.GetExtension(imageFile.FileName);
+            string uniqueFileName = Guid.NewGuid().ToString() + fileExtension;
             string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
             using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -95,7 +108,9 @@ namespace KvizHub.Api.Services.Auth
             {
                 new Claim(ClaimTypes.NameIdentifier, user.UserID.ToString()),
                 new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, user.UserRole.ToString())
+                new Claim(ClaimTypes.Role, user.UserRole.ToString()),
+                new Claim("profilePictureUrl", user.ProfilePictureUrl ?? string.Empty)
+
             };
 
             var keyString = _configuration.GetSection("Jwt:Key").Value;

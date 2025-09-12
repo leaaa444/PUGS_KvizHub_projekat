@@ -5,6 +5,7 @@ import authService from '../services/authService';
 interface User {
   username: string;
   role: string;
+  profilePictureUrl: string; 
 }
 
 interface AuthContextType {
@@ -30,7 +31,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (decodedUser.exp * 1000 > Date.now()) {
           setUser({ 
             username: decodedUser.unique_name, 
-            role: decodedUser.role 
+            role: decodedUser.role ,
+            profilePictureUrl: decodedUser.profilePictureUrl
           });
         } else {
           logout();
@@ -49,16 +51,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const login = async (username: string, password: string) => {
-    const response = await authService.login(username, password);
-    if (response.data.token) {
-      const newToken = response.data.token;
-      localStorage.setItem('user_token', newToken);
-      const decodedUser: any = jwtDecode(newToken);
-      setUser({ 
-        username: decodedUser.unique_name, 
-        role: decodedUser.role 
-      });
-      setToken(newToken);
+    try {
+        const response = await authService.login(username, password);
+        
+        if (response.data.token) {
+            const newToken = response.data.token;
+            localStorage.setItem('user_token', newToken);
+            const decodedUser: any = jwtDecode(newToken);
+            setUser({ 
+                username: decodedUser.unique_name, 
+                role: decodedUser.role,
+                profilePictureUrl: decodedUser.profilePictureUrl
+            });
+            setToken(newToken);
+        }
+    } catch (error) {
+        console.error("Greška pri prijavi (AuthContext):", error);
+        throw error; 
     }
   };
 

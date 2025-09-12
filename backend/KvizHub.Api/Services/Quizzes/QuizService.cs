@@ -18,6 +18,11 @@ namespace KvizHub.Api.Services.Quizzes
             _context = context;
         }
 
+        public class QuizHasResultsException : Exception
+        {
+            public QuizHasResultsException(string message) : base(message) { }
+        }
+
         #region GET
         public async Task<IEnumerable<QuizListDto>> GetQuizzesAsync()
         {
@@ -102,13 +107,8 @@ namespace KvizHub.Api.Services.Quizzes
 
         #endregion
 
-        public async Task<QuizDto?> CreateQuiz(CreateQuizWithQuestionsDto dto)
+        public async Task<QuizDto> CreateQuiz(CreateQuizWithQuestionsDto dto)
         {
-            if (await _context.Quizzes.AnyAsync(q => q.Name.ToLower() == dto.Name.ToLower() && !q.IsArchived))
-            {
-                return null; 
-            }
-
             var newQuiz = new Quiz
             {
                 Name = dto.Name,
@@ -172,13 +172,36 @@ namespace KvizHub.Api.Services.Quizzes
                 .ThenInclude(qc => qc.Category)
             .Include(q => q.Questions)
                 .ThenInclude(qu => qu.AnswerOptions)
+            .Include(q => q.QuizResults)
             .FirstOrDefaultAsync(q => q.QuizID == quizId);
 
             if (quiz == null || quiz.IsArchived) return null;
 
-            UpdateQuizDetails(quiz, updateQuizDto);
-            await UpdateQuizCategories(quiz, updateQuizDto);
-            UpdateQuizQuestions(quiz, updateQuizDto);
+            bool hasResults = quiz.QuizResults.Any();
+
+            if (hasResults)
+            {
+                bool isStructuralChange = CheckForStructuralChanges(quiz, updateQuizDto);
+
+                if (isStructuralChange)
+                {
+                    throw new QuizHasResultsException(
+                        "Nije moguće menjati težinu, vreme i pitanja kvizu sa već postojećim pokušajima rešavanja. Da li želite da arhivirate ovaj i napravite novi?"
+                    );
+                }
+                else
+                {
+                    UpdateSafeQuizDetails(quiz, updateQuizDto);
+                    await UpdateQuizCategories(quiz, updateQuizDto);
+                }
+            }
+            else
+            {
+                UpdateSafeQuizDetails(quiz, updateQuizDto);
+                UpdateStructuralQuizDetails(quiz, updateQuizDto);
+                await UpdateQuizCategories(quiz, updateQuizDto);
+                UpdateQuizQuestions(quiz, updateQuizDto);
+            }
 
             await _context.SaveChangesAsync();
 
@@ -193,10 +216,66 @@ namespace KvizHub.Api.Services.Quizzes
             };
         }
 
-        private void UpdateQuizDetails(Quiz quiz, UpdateQuizDto dto)
+        private bool CheckForStructuralChanges(Quiz quiz, UpdateQuizDto dto)
+        {
+            if (quiz.Difficulty != dto.Difficulty || quiz.TimeLimit != dto.TimeLimit)
+            {
+                return true;
+            }
+
+            if (quiz.Questions.Count != dto.Questions.Count) return true;
+
+            var existingQuestionIds = quiz.Questions.Select(q => q.QuestionID).ToHashSet();
+            var dtoQuestionIds = dto.Questions.Select(q => q.QuestionID).ToHashSet();
+
+            if (!existingQuestionIds.SetEquals(dtoQuestionIds)) return true;
+
+            foreach (var existingQuestion in quiz.Questions)
+            {
+                var dtoQuestion = dto.Questions.First(q => q.QuestionID == existingQuestion.QuestionID);
+
+                if (existingQuestion.QuestionText != dtoQuestion.QuestionText ||
+                    existingQuestion.CorrectTextAnswer != dtoQuestion.CorrectTextAnswer ||
+                    existingQuestion.Type != dtoQuestion.Type)
+                        return true;
+
+                var existingOptions = existingQuestion.AnswerOptions;
+                var dtoOptions = dtoQuestion.AnswerOptions;
+
+                if (existingOptions == null && dtoOptions != null) return true;
+                if (existingOptions != null && dtoOptions == null) return true;
+
+                if (existingOptions != null && dtoOptions != null)
+                {
+                    if (existingOptions.Count != dtoOptions.Count) return true;
+
+                    var existingAnswerOptionsIds = existingOptions.Select(ao => ao.AnswerOptionID).ToHashSet();
+                    var dtoAnswerOptionsIds = dtoOptions.Select(ao => ao.AnswerOptionID).ToHashSet();
+
+                    if (!existingAnswerOptionsIds.SetEquals(dtoAnswerOptionsIds)) return true;
+
+                    foreach (var existingAnswerOption in existingOptions)
+                    {
+                        var dtoAnswerOption = dtoOptions.First(ao => ao.AnswerOptionID == existingAnswerOption.AnswerOptionID);
+
+                        if (existingAnswerOption.Text != dtoAnswerOption.Text ||
+                           existingAnswerOption.IsCorrect != dtoAnswerOption.IsCorrect) return true;
+                    }
+                }
+
+            }
+
+            return false; 
+        }
+
+        private void UpdateSafeQuizDetails(Quiz quiz, UpdateQuizDto dto)
         {
             quiz.Name = dto.Name;
             quiz.Description = dto.Description;
+        }
+
+        private void UpdateStructuralQuizDetails(Quiz quiz, UpdateQuizDto dto)
+        {
             quiz.Difficulty = dto.Difficulty;
             quiz.TimeLimit = dto.TimeLimit;
         }
@@ -302,6 +381,22 @@ namespace KvizHub.Api.Services.Quizzes
             }
         }
         #endregion
+
+        public async Task<QuizDto> ArchiveAndCreateNewAsync(int originalQuizId, CreateQuizWithQuestionsDto dto)
+        {
+            var originalQuiz = await _context.Quizzes.FindAsync(originalQuizId);
+            if (originalQuiz == null)
+            {
+                throw new KeyNotFoundException("Originalni kviz za arhiviranje nije pronađen.");
+            }
+            originalQuiz.IsArchived = true;
+
+            await _context.SaveChangesAsync();
+
+            var newQuizDto = await CreateQuiz(dto);
+
+            return newQuizDto;
+        }
 
         public async Task<bool> DeleteQuizAsync(int quizId)
         {

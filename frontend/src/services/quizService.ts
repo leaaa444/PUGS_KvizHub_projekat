@@ -40,6 +40,10 @@ const updateQuiz = (id: number, quizData: any) => {
   return axios.put(API_URL + id, quizData, { headers: authHeader() });
 };
 
+const archiveAndCreateNew = (id: number, quizData: any) => {
+  return axios.post(`${API_URL}${id}/archiveAndCreateNew`, quizData, { headers: authHeader() });
+};
+
 
 const quizService = {
   getQuizzes,
@@ -49,6 +53,7 @@ const quizService = {
   getQuizById,
   updateQuiz,
   getQuizForTaker,
+  archiveAndCreateNew,
 };
 
 export default quizService;

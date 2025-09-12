@@ -139,7 +139,7 @@ const QuizListPage: React.FC = () => {
             <QuizCard key={quiz.quizID} quiz={quiz} />
           ))
         ) : (
-          <p>Nema kvizova koji odgovaraju zadatim kriterijumima.</p>
+          <p className="no-quizzes-message">Nema kvizova koji odgovaraju zadatim kriterijumima.</p>
         )}
       </div>
     </div>

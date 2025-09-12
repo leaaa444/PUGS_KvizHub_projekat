@@ -1,0 +1,282 @@
+.tabs-container {
+    display: flex;
+    justify-content: center;
+    border-bottom: 2px solid var(--button-color);
+    margin-bottom: 2rem;
+}
+
+.tab-button {
+    padding: 1rem 2rem;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    opacity: 0.6;
+    font-size: var(--font-size-large);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+    position: relative;
+    transition: opacity 0.2s ease;
+}
+
+.tab-button:hover {
+    opacity: 1;
+}
+
+.tab-button.active {
+    opacity: 1;
+}
+
+.tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; /* Postavlja liniju tačno na border */
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--foreground);
+}
+
+
+/* ===================================== */
+
+.global-ranking-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+    color: var(--text-color);
+}
+
+.global-ranking-container h1 {
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    font-size: var(--font-size-large);
+    opacity: 0.8;
+}
+
+.global-ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.global-ranking-table th, .global-ranking-table td {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid var(--button-color);
+    vertical-align: middle;
+}
+
+.global-ranking-table thead th {
+    background-color: var(--button-color);
+}
+
+.global-ranking-table tbody tr {
+    background-color: var(--background);
+}
+
+.global-ranking-table tbody tr:hover {
+    background-color: var(--button-color);
+}
+
+.global-ranking-table tbody tr.highlighted-row {
+    background-color: var(--foreground); /* Koristimo boju iz vaše palete */
+    color: var(--button-color); /* Tamni tekst za bolji kontrast */
+    font-weight: var(--font-weight-bold);
+}
+
+/* Opciono: Lepši izgled za sliku i skor u istaknutom redu */
+.global-ranking-table tbody tr.highlighted-row .rank-avatar img {
+    border: 2px solid var(--button-color);
+}
+
+.global-ranking-table tbody tr.highlighted-row .rank-score {
+    color: var(--button-color);
+}
+
+.rank-position {
+    font-size: 1.5rem;
+    font-weight: var(--font-weight-bold);
+    text-align: center;
+    width: 10%;
+}
+
+.rank-avatar {
+    width: 70px;
+    padding: 8px;
+}
+
+.rank-avatar img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.rank-username {
+    font-weight: var(--font-weight-bold);
+}
+
+.rank-score {
+    font-size: 1.2rem;
+    font-weight: var(--font-weight-bold);
+    text-align: right;
+    color: var(--foreground);
+}
+
+/* ====================================================== */
+
+.filters-container {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+    background-color: var(--button-color);
+    padding: 15px;
+    border-radius: var(--border-radius);
+    align-content: center;
+    margin-left: 175px;
+    margin-right: 175px;
+}
+
+.quiz-name-filter {
+    min-width: 350px;
+    font-family: var(--font-family-main);
+}
+
+.date-filters {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.date-filters input[type="date"] {
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    border: 1px solid var(--foreground);
+    border-radius: var(--border-radius);
+    padding: 8px;
+    font-family: var(--font-family-main);
+}
+/* Stil za ikonicu kalendara u Chrome-u */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+.ranking-page-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    color: var(--text-color);
+}
+
+.ranking-page-container h1 {
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+.page-subtitle {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    font-size: var(--font-size-large);
+    opacity: 0.8;
+}
+
+.rankings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+}
+
+.quiz-ranking-card {
+    background-color: var(--button-color);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.quiz-ranking-card h3 {
+    margin: 0 0 1.5rem 0;
+    text-align: center;
+    border-bottom: 1px solid var(--background);
+    padding-bottom: 1rem;
+}
+
+.players-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.players-list li {
+    display: flex;
+    align-items: center;
+    background-color: var(--background);
+    padding: 0.75rem;
+    border-radius: 5px;
+}
+
+.players-list li.highlighted-player {
+    background-color: var(--foreground);
+    color: var(--button-color);
+    transform: scale(1.02); /* Blago uvećanje da se dodatno istakne */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.players-list li.highlighted-player .player-avatar {
+    border: 2px solid var(--button-color);
+}
+
+.player-rank {
+    font-weight: var(--font-weight-bold);
+    font-size: 1.1rem;
+    margin-right: 1rem;
+    width: 25px;
+}
+
+.player-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 1rem;
+}
+
+.player-name {
+    flex-grow: 1;
+    font-weight: var(--font-weight-bold);
+}
+
+.player-stats {
+    display: flex;
+    flex-direction: column; /* Ređa skor i vreme jedno ispod drugog */
+    align-items: flex-end; /* Poravnava ih desno */
+    text-align: right;
+    margin-left: auto; /* Gura ovaj element skroz desno */
+    padding-left: 10px;
+}
+
+.player-score {
+    font-size: 1rem;
+    font-weight: var(--font-weight-bold);
+}
+
+.player-time {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+.no-results-msg {
+    text-align: center;
+    opacity: 0.7;
+    font-style: italic;
+}

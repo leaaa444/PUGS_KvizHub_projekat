@@ -23,6 +23,9 @@ namespace KvizHub.Api.Controllers
             if (await _authService.UserExists(registerDto.Username))
                 return BadRequest("Korisničko ime već postoji.");
 
+            if (await _authService.EmailExists(registerDto.Email))
+                return BadRequest(new { message = "Email adresa je već u upotrebi." });
+
             try
             {
                 await _authService.Register(registerDto);

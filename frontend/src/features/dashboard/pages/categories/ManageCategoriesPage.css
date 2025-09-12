@@ -1,5 +1,10 @@
 .manage-categories-page {
   padding: 1rem;
+   transform: translateX(calc(-280px / 2));
+   margin-left: auto;
+    margin-right: auto;
+    max-width: 800px;
+    padding: 1rem;
 }
 
 .add-category-form {
@@ -8,7 +13,8 @@
   margin-bottom: 2rem;
 }
 
-.add-category-form input {
+.add-category-form input,
+.modal-form input {
   flex-grow: 1;
   padding: 10px;
   background-color: var(--button-color);
@@ -16,6 +22,12 @@
   border-radius: var(--border-radius);
   color: var(--text-color);
   font-size: var(--font-size-base);
+}
+
+.add-category-form input:focus,
+.modal-form input:focus {
+  outline: none;
+  border-color: var(--text-color);
 }
 
 .add-category-form .btn {
@@ -36,6 +48,7 @@
   background-color: var(--background);
   border-radius: var(--border-radius);
   margin-bottom: 0.5rem;
+  border-bottom: 2px var(--button-color);
 }
 
 .category-actions .btn-delete {
@@ -45,4 +58,22 @@
   padding: 5px 10px;
   border-radius: var(--border-radius);
   cursor: pointer;
+}
+
+.category-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.category-actions .btn-edit {
+  border-radius: var(--border-radius);
+  background-color: var(--button-color);
+  color: var(--text-color);
+  border: none;
+  padding: 5px 10px;
+}
+
+.btn-secondary{
+  margin-right: 5px;
+  background-color: #a94442 !important;
 }

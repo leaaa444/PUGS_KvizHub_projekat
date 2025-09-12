@@ -40,12 +40,22 @@ namespace KvizHub.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCategory(int id, CreateCategoryDto dto)
+        public async Task<IActionResult> UpdateCategory(int id, [FromBody] CreateCategoryDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            var updatedCategory = await _categoryService.UpdateCategoryAsync(id, dto);
-            if (updatedCategory == null) return NotFound();
-            return Ok(updatedCategory);
+            try { 
+                var updatedCategory = await _categoryService.UpdateCategoryAsync(id, dto);
+                if (updatedCategory == null)
+                {
+                    return NotFound($"Kategorija sa ID-jem {id} nije pronađena.");
+                }
+
+                return Ok(updatedCategory);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpDelete("{id}")]

@@ -14,6 +14,10 @@ namespace KvizHub.Api.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+
             // Konfiguracija za vezu između QuizCategory (rešava problem kompozitnog ključa)
             modelBuilder.Entity<QuizCategory>()
                 .HasKey(qc => new { qc.QuizID, qc.CategoryID });

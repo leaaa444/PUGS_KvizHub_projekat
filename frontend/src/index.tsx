@@ -8,17 +8,17 @@ import axios from 'axios';
 
 axios.interceptors.response.use(
   (response) => response,
-  
   (error) => {
-    if (error.response && error.response.status === 401) {
-      // Token je nevalidan ili istekao
-      console.error("Auth Error 401: Token je nevalidan ili istekao. Odjavljivanje...");
-      
-      // Brišemo token iz memorije
-      localStorage.removeItem('user_token');
-      
-      // Forsiramo reload aplikacije i preusmeravamo na početnu stranicu
-      window.location.href = '/'; 
+    const originalRequest = error.config;
+    const isAuthError = error.response && error.response.status === 401;
+    if (isAuthError && originalRequest.url === `${process.env.REACT_APP_API_URL}/Auth/login`) {
+        return Promise.reject(error);
+    }
+
+    if (isAuthError) {
+        console.error("Token istekao ili je nevalidan. Odjavljivanje...");
+        localStorage.removeItem('user_token');
+        window.location.href = '/'; 
     }
     
     return Promise.reject(error);

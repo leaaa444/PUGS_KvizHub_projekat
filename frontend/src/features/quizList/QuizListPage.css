@@ -32,6 +32,17 @@
   gap: 2rem;
 }
 
+.no-quizzes-message {
+    grid-column: 1 / -1;
+    
+    text-align: center;
+    
+    font-size: var(--font-size-large);
+    opacity: 0.8;
+    margin-top: 3rem;
+}
+
+
 .error-message {
   color: var(--danger); /* Korišćenje varijable za boju greške */
   text-align: center;

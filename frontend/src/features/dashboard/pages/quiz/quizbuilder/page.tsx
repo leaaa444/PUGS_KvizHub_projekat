@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import quizService from '../../../../../services/quizService';
 import QuizForm from '../components/quizForm/QuizForm';
 import QuestionForm from '../components/questionForm/QuestionForm';
+import Modal from '../../../../../components/Modal/Modal';
 import './style.css';
 
 const emptyQuestion = { 
@@ -16,6 +17,9 @@ const emptyQuestion = {
 const QuizBuilderPage = () => {
   const { quizId } = useParams<{ quizId: string }>();
   const navigate = useNavigate();
+
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [confirmModalMessage, setConfirmModalMessage] = useState('');
 
   const nextTempId = useRef(-1);
   const getNextTempId = () => {
@@ -114,6 +118,40 @@ const QuizBuilderPage = () => {
     setQuestions(questions.filter((_, i) => i !== indexToRemove));
   };
 
+  const handleConfirmArchive = async () => {
+    setIsConfirmModalOpen(false);
+    setIsSaving(true);
+
+    const cleanedQuestions = questions.map(q => {
+        if (q.type === 3) {
+            return { ...q, answerOptions: [] };
+        }
+        return q;
+    });
+
+    const finalDto = {
+      ...quizDetails,
+      categoryIds: quizDetails.categoryIds.map((c: any) => c.value), 
+      questions: cleanedQuestions
+    };
+
+    try {
+        if (quizId) {
+            await quizService.archiveAndCreateNew(parseInt(quizId), finalDto);
+            alert('Stari kviz je arhiviran, a novi sa izmenama je uspešno kreiran!');
+            navigate(`/dashboard/kvizovi/`);
+        }
+    } catch (archiveError: any) {
+        setError(archiveError.response?.data?.message || 'Greška prilikom arhiviranja.');
+    } finally {
+        setIsSaving(false);
+    }
+  };
+
+  const handleCancelArchive = () => {
+      setIsConfirmModalOpen(false);
+  };
+
   const handleSaveAll = async () => {
     setError(null);
 
@@ -180,13 +218,22 @@ const QuizBuilderPage = () => {
     try {
       if (isEditMode && quizId) {
         await quizService.updateQuiz(parseInt(quizId), finalDto);
+        navigate(`/dashboard/kvizovi/`);
       } else {
         await quizService.createQuizWithQuestions(finalDto);
+            navigate(`/dashboard/kvizovi/`);
       }
-      navigate(`/dashboard/kvizovi/`);
-    } catch (error) {
-      console.error("Greška pri čuvanju kviza", error);
-      setIsSaving(false);
+    } catch (error: any) {
+      if (isEditMode && quizId && error.response && error.response.status === 409) {
+            setConfirmModalMessage(error.response.data.message);
+            setIsConfirmModalOpen(true);
+        } else {
+            setError(error.response?.data?.message || "Došlo je do greške pri čuvanju kviza.");
+        }
+    } finally {
+        if (!isConfirmModalOpen) { 
+             setIsSaving(false);
+        }
     }
   };
 
@@ -195,21 +242,28 @@ const QuizBuilderPage = () => {
   }
 
   const handleAddAnswerOption = (questionIndex: number) => {
-    setQuestions(prevQuestions => {
-        const newQuestions = [...prevQuestions];
-        const question = newQuestions[questionIndex];
-        
-        question.answerOptions.push({
-            answerOptionID: getNextTempId(),
-            text: '',
-            isCorrect: false
-        });
-        
-        return newQuestions;
-    });
-};
+    setQuestions(prevQuestions => 
+      prevQuestions.map((question, index) => {
+        if (index !== questionIndex) {
+          return question;
+        }
+        return {
+          ...question, 
+          answerOptions: [
+            ...question.answerOptions,
+            {
+              answerOptionID: getNextTempId(),
+              text: '',
+              isCorrect: false
+            }
+          ]
+        };
+      })
+    );
+  };
 
   return (
+    <>
     <form onSubmit={(e) => { e.preventDefault(); handleSaveAll(); }} className="form-page-container">
       
       <h2>{isEditMode ? `Uređivanje Kviza: ${quizDetails.name}` : 'Kreiraj Novi Kviz'}</h2>
@@ -258,6 +312,23 @@ const QuizBuilderPage = () => {
         </button>
       </div>
     </form>
+
+<Modal isOpen={isConfirmModalOpen} onClose={handleCancelArchive}>
+        <div className="confirmation-modal">
+            <h3>Potvrda izmene</h3>
+            {/* Prikazujemo poruku sa servera */}
+            <p>{confirmModalMessage}</p> 
+            <div className="modal-actions">
+                <button type="button" onClick={handleCancelArchive} className="btn-secondary btn">
+                    Poništi
+                </button>
+                <button type="button" onClick={handleConfirmArchive} className="btn">
+                    OK
+                </button>
+            </div>
+        </div>
+      </Modal>
+    </>
   );
 };
 

@@ -7,6 +7,8 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const [isDropdownOpen, setDropdownOpen] = useState(false);
 
+const fullProfilePictureUrl = user && user.profilePictureUrl ? `${process.env.REACT_APP_API_BASE_URL}${user.profilePictureUrl}` : '';
+
   if (!user) { 
     return null;
   }
@@ -24,6 +26,7 @@ const Navbar = () => {
 
       <div className="navbar-links">
         <Link to="/kvizovi" className="navbar-links">Kvizovi</Link>
+        <Link to="/moji-rezultati" className="navbar-links">Moji rezultati</Link>
         <Link to="/rang-lista" className="navbar-links">Rang Lista</Link>
         {user.role === 'Admin' && (
           <Link to="/dashboard" className="navbar-links">Dashboard</Link>
@@ -35,7 +38,12 @@ const Navbar = () => {
             onClick={() => setDropdownOpen(!isDropdownOpen)} 
             className="user-menu-trigger"
           >
-            Moj Nalog ▼ 
+            <img 
+              src={fullProfilePictureUrl} 
+              alt="Profilna slika" 
+              className="navbar-profile-pic" 
+            /> 
+            <span>▼</span>
           </button>
 
           {isDropdownOpen && (

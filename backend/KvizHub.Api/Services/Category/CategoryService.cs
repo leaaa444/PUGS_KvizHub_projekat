@@ -47,6 +47,9 @@ namespace KvizHub.Api.Services.Category
                 return null;
             }
 
+            var nameExists = await _context.Categories
+                                   .AnyAsync(c => c.Name == dto.Name && c.CategoryID != categoryId);
+
             category.Name = dto.Name;
             await _context.SaveChangesAsync();
             return new CategoryDto { CategoryID = category.CategoryID, Name = category.Name };

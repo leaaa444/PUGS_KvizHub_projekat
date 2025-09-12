@@ -11,6 +11,6 @@ namespace KvizHub.Api.Services.Category
         Task<List<CategoryDto>> GetCategoriesAsync();
         Task<CategoryDto?> CreateCategoryAsync(CreateCategoryDto dto);
         Task<CategoryDto?> UpdateCategoryAsync(int categoryId, CreateCategoryDto dto);
-        Task<bool> DeleteCategoryAsync(int categoryId);
+        Task<bool> DeleteCategoryAsync(int categoryId);        
     }
 }

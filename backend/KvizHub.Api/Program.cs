@@ -20,8 +20,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: myAllowSpecificOrigins,
         policy =>
         {
-            policy.WithOrigins("http://localhost:3000",      
-                               "http://192.168.1.4:3000")   
+            policy.AllowAnyOrigin()
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });

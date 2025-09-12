@@ -8,7 +8,7 @@ interface LoginFormProps {
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
-  const [username, setUsername] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
 
@@ -20,7 +20,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
     e.preventDefault();
     setMessage('');
     try {
-      await login(username, password); 
+      await login(identifier, password); 
       onSuccess(); 
       navigate('/kvizovi');
     } catch (error) {
@@ -33,12 +33,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
       <form onSubmit={handleLogin} className="auth-form">
         <h2>Prijava</h2>
         <div className="auth-form-group">
-          <label htmlFor="login-username">Korisničko ime</label>
+          <label htmlFor="login-username">Korisničko ime ili Email</label>
           <input
             type="text"
             id="login-username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
             required
           />
         </div>

@@ -43,7 +43,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
       navigate('/kvizovi');
 
     } catch (error: any) {
-      const resMessage = error.response?.data || 'Došlo je do greške!';
+      const resMessage = error.response?.data?.message || 'Došlo je do greške!';
       setMessage(resMessage);
     }
   };

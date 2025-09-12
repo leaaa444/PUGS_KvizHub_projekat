@@ -15,6 +15,8 @@ namespace KvizHub.Api.Services
             _context = context;
         }
 
+        #region get
+
         public async Task<QuizResultDetailsDto?> GetResultDetailsAsync(int resultId, string userId)
         {
             var resultEntity = await _context.QuizResults
@@ -42,7 +44,6 @@ namespace KvizHub.Api.Services
                 TimeTaken = resultEntity.CompletionTime,
                 Questions = resultEntity.Quiz.Questions.Select(q =>
                 {
-                    // Pronalazimo korisnikov odgovor za ovo konkretno pitanje
                     var userAnswer = resultEntity.UserAnswers.FirstOrDefault(ua => ua.QuestionID == q.QuestionID);
 
                     return new QuestionResultDto
@@ -74,7 +75,6 @@ namespace KvizHub.Api.Services
             return resultDto;
         }
 
-        // Helper funkcija za proveru tačnosti odgovora
         private static bool IsAnswerCorrect(Models.UserAnswer userAnswer, Models.Question question)
         {
             if (question.Type == Models.Enums.QuestionType.FillInTheBlank)
@@ -88,6 +88,200 @@ namespace KvizHub.Api.Services
                 return correctOptionIds.SetEquals(selectedOptionIds);
             }
         }
+
+        public async Task<IEnumerable<MyResultDto>> GetMyResultsAsync(string userId)
+        {
+            var results = await _context.QuizResults
+                .Where(qr => qr.User.UserID.ToString() == userId)
+                .Include(qr => qr.Quiz)
+                    .ThenInclude(q => q.Questions)
+                .OrderByDescending(qr => qr.DateOfCompletion)
+                .Select(qr => new MyResultDto
+                {
+                    ResultId = qr.QuizResultID,
+                    QuizName = qr.Quiz.Name,
+                    DateCompleted = qr.DateOfCompletion,
+                    Score = qr.Score,
+                    Percentage = qr.Quiz.Questions.Any() ? (qr.Score / qr.Quiz.Questions.Sum(q => q.PointNum)) * 100 : 0,
+                    AttemptNum = qr.AttemptNum
+                })
+                .ToListAsync();
+
+            return results;
+        }
+
+        public async Task<ArchivedResultDetailsDto?> GetArchivedResultDetailsAsync(int resultId, string userId)
+        {
+            var result = await _context.QuizResults
+                .Where(qr => qr.QuizResultID == resultId && qr.User.UserID.ToString() == userId)
+                .Include(qr => qr.Quiz)
+                    .ThenInclude(q => q.Questions)
+                        .ThenInclude(qu => qu.AnswerOptions)
+                .Include(qr => qr.Quiz)
+                    .ThenInclude(q => q.QuizCategories)
+                        .ThenInclude(qc => qc.Category)
+                .Include(qr => qr.UserAnswers)
+                    .ThenInclude(ua => ua.SelectedOptions)
+                .Select(qr => new ArchivedResultDetailsDto
+                {
+                    QuizId = qr.QuizID,
+                    QuizName = qr.Quiz.Name,
+                    Description = qr.Quiz.Description,
+                    Difficulty = qr.Quiz.Difficulty.ToString(),
+                    Categories = qr.Quiz.QuizCategories.Select(qc => qc.Category.Name).ToList(),
+                    TimeTaken = qr.CompletionTime,
+                    Questions = qr.Quiz.Questions.Select(q => new ArchivedQuestionDto
+                    {
+                        QuestionId = q.QuestionID,
+                        Type = q.Type,
+                        Text = q.QuestionText,
+                        Points = q.PointNum,
+                        Options = q.AnswerOptions.Select(opt => new OptionResultDto
+                        {
+                            OptionId = opt.AnswerOptionID,
+                            Text = opt.Text
+                        }).ToList(),
+                        UserAnswer = qr.UserAnswers.Where(ua => ua.QuestionID == q.QuestionID)
+                                       .Select(ua => new UserAnswerResultDto
+                                       {
+                                           AnswerText = ua.GivenTextAnswer,
+                                           AnswerOptionIds = ua.SelectedOptions.Select(so => so.AnswerOptionId).ToList()
+                                       }).FirstOrDefault() ?? new UserAnswerResultDto()
+                    }).ToList()
+                })
+                .FirstOrDefaultAsync();
+
+            return result;
+        }
+
+        public async Task<IEnumerable<QuizProgressDto>> GetQuizProgressAsync(int quizId, string userId)
+        {
+            var progress = await _context.QuizResults
+                .Where(qr => qr.User.UserID.ToString() == userId && qr.QuizID == quizId)
+                .Include(qr => qr.Quiz)
+                    .ThenInclude(q => q.Questions)
+                .OrderBy(qr => qr.AttemptNum) 
+                .Select(qr => new QuizProgressDto
+                {
+                    AttemptNum = qr.AttemptNum,
+                    Percentage = qr.Quiz.Questions.Any() ? (qr.Score / qr.Quiz.Questions.Sum(q => q.PointNum)) * 100 : 0
+                })
+                .ToListAsync();
+
+            return progress;
+        }
+
+        public async Task<IEnumerable<AllRankingsDto>> GetAllQuizRankingsAsync(DateTime? startDate, DateTime? endDate)
+        {
+            if (startDate.HasValue && !endDate.HasValue)
+            {
+                endDate = startDate;
+            }
+
+            IQueryable<QuizResult> resultsQuery = _context.QuizResults.AsQueryable();
+
+            if (startDate.HasValue)
+            {
+                resultsQuery = resultsQuery.Where(qr => qr.DateOfCompletion.Date >= startDate.Value.Date);
+            }
+            if (endDate.HasValue)
+            {
+                resultsQuery = resultsQuery.Where(qr => qr.DateOfCompletion.Date <= endDate.Value.Date);
+            }
+
+            var bestResults = await resultsQuery
+                .Include(qr => qr.User)    
+                .Include(qr => qr.Quiz)    
+                .GroupBy(qr => new { qr.UserID, qr.QuizID })
+                .Select(group => group.OrderByDescending(qr => qr.Score).ThenBy(qr => qr.CompletionTime).First())
+                .ToListAsync();
+
+            var allRankings = new List<AllRankingsDto>();
+
+            var rankingsByQuiz = bestResults
+                 .GroupBy(r => r.Quiz)
+                 .Select(group => new AllRankingsDto
+                 {
+                     QuizId = group.Key.QuizID,
+                     QuizName = group.Key.Name,
+                     TopPlayers = group
+                         .OrderByDescending(r => r.Score) 
+                         .ThenBy(r => r.CompletionTime)
+                         .Select(r => new RankingEntryDto
+                         {
+                             Username = r.User.Username,
+                             UserProfilePictureUrl = r.User.ProfilePictureUrl,
+                             Score = r.Score,
+                             TimeTaken = r.CompletionTime,
+                             DateCompleted = r.DateOfCompletion
+                         }).ToList()
+                 })
+                 .OrderBy(q => q.QuizName) 
+                 .ToList();
+
+            return rankingsByQuiz;
+        }
+
+        public async Task<IEnumerable<GlobalRankingDto>> GetGlobalRankingsAsync()
+        {
+            var allResults = await _context.QuizResults
+                .Include(qr => qr.User)
+                .Include(qr => qr.Quiz)
+                    .ThenInclude(q => q.Questions)
+                .ToListAsync();
+
+            var userScores = new Dictionary<int, List<double>>();
+
+            var bestUserResults = allResults
+                .GroupBy(r => new { r.UserID, r.QuizID })
+                .Select(g => g.OrderByDescending(r => r.Score).ThenBy(r => r.CompletionTime).First());
+
+            var resultsByUser = bestUserResults.GroupBy(r => r.User);
+
+            var globalScores = new List<(User User, double GlobalScore, int QuizzesPlayed)>();
+
+            foreach (var userGroup in resultsByUser)
+            {
+                var user = userGroup.Key;
+                var weightedScores = new List<double>();
+
+                foreach (var result in userGroup)
+                {
+                    var maxPoints = result.Quiz.Questions.Sum(q => q.PointNum);
+                    if (maxPoints == 0) continue;
+
+                    double percentage = (result.Score / maxPoints) * 100;
+                    double weight = result.Quiz.Difficulty switch
+                    {
+                        Models.Enums.QuizDifficulty.Medium => 1.25,
+                        Models.Enums.QuizDifficulty.Hard => 1.5,
+                        _ => 1.0
+                    };
+
+                    weightedScores.Add(percentage * weight);
+                }
+
+                if (weightedScores.Any())
+                {
+                    globalScores.Add((user, weightedScores.Average(), weightedScores.Count));
+                }
+            }
+
+            var rankedUsers = globalScores
+                .OrderByDescending(s => s.GlobalScore)
+                .Select((s, index) => new GlobalRankingDto
+                {
+                    Position = index + 1,
+                    Username = s.User.Username,
+                    UserProfilePictureUrl = s.User.ProfilePictureUrl,
+                    GlobalScore = s.GlobalScore,
+                    QuizzesPlayed = s.QuizzesPlayed
+                });
+
+            return rankedUsers;
+        }
+
+        #endregion
 
         public async Task<QuizResultDto> SubmitQuizAsync(QuizSubmissionDto submissionDto, int userId)
         {

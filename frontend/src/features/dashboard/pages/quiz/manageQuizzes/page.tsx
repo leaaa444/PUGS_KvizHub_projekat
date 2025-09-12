@@ -65,8 +65,10 @@ const ManageQuizzesPage = () => {
               <td>{quiz.numberOfQuestions}</td>
               <td>{quiz.timesCompleted}</td>
               <td className="actions-cell">
-                <button onClick={() => handleEdit(quiz.quizID)} className="btn-edit">Izmeni</button>
-                <button onClick={() => handleDelete(quiz.quizID)} className="btn-delete">Obriši</button>
+                <div className="actions-cell-wrapper">
+                  <button onClick={() => handleEdit(quiz.quizID)} className="btn-edit">Izmeni</button>
+                  <button onClick={() => handleDelete(quiz.quizID)} className="btn-delete">Obriši</button>
+                </div>
               </td>
             </tr>
           ))}

@@ -11,8 +11,9 @@ namespace KvizHub.Api.Services.Quizzes
         Task<IEnumerable<QuizListDto>> GetQuizzesAsync();
         Task<QuizDto?> GetQuizByIdAsync(int quizId);
         Task<QuizForTakerDto> GetQuizForTakerAsync(int quizId);
-        Task<QuizDto?> CreateQuiz(CreateQuizWithQuestionsDto dto);
-        Task<QuizDto?> UpdateQuizAsync(int quizId, UpdateQuizDto updateQuizDto); 
+        Task<QuizDto> CreateQuiz(CreateQuizWithQuestionsDto dto);
+        Task<QuizDto?> UpdateQuizAsync(int quizId, UpdateQuizDto updateQuizDto);
+        Task<QuizDto> ArchiveAndCreateNewAsync(int originalQuizId, CreateQuizWithQuestionsDto createDto);
         Task<bool> DeleteQuizAsync(int quizId);
     }
 }

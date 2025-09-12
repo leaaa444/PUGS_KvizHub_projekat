@@ -15,13 +15,15 @@ const deleteCategory = (id: number) => {
   return axios.delete(API_URL + id, { headers: authHeader() });
 };
 
-// Funkciju za update ćemo dodati kasnije
-// const updateCategory = (id, name) => { ... };
+const updateCategory = (id: number, data: { name: string }) => {
+  return axios.put(`${API_URL}${id}`, data, { headers: authHeader() });
+};
 
 const categoryService = {
   getCategories,
   createCategory,
   deleteCategory,
+  updateCategory,
 };
 
 export default categoryService;

@@ -6,6 +6,7 @@ using KvizHub.Api.Services.Quizzes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using static KvizHub.Api.Services.Quizzes.QuizService;
 
 namespace KvizHub.Api.Controllers
 {
@@ -74,11 +75,6 @@ namespace KvizHub.Api.Controllers
 
             var createdQuiz = await _quizService.CreateQuiz(dto);
 
-            if (createdQuiz == null)
-            {
-                return Conflict("Kviz sa tim imenom već postoji.");
-            }
-
             return CreatedAtAction(nameof(GetQuizById), new { id = createdQuiz.QuizID }, createdQuiz);
         }
 
@@ -98,14 +94,55 @@ namespace KvizHub.Api.Controllers
             return StatusCode(201, newQuestionDto);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateQuiz(int id, UpdateQuizDto updateQuizDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            var updatedQuiz = await _quizService.UpdateQuizAsync(id, updateQuizDto);
-            if (updatedQuiz == null) return NotFound();
-            return Ok(updatedQuiz);
+            try
+            {
+                var updatedQuiz = await _quizService.UpdateQuizAsync(id, updateQuizDto);
+                return Ok(updatedQuiz);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                // Uhvaćena greška kviz sa datim ID-jem ne postoji
+                return NotFound(new { message = ex.Message });
+            }
+            catch (QuizHasResultsException ex)
+            {
+                // Uhvaćena greška za pokušaj izmene "živog" kviza, status 409 Conflict 
+                return StatusCode(409, new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("{id:int}/archiveAndCreateNew")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ArchiveAndCreateNew(int id, [FromBody] CreateQuizWithQuestionsDto dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var newQuiz = await _quizService.ArchiveAndCreateNewAsync(id, dto);
+
+                return CreatedAtAction(nameof(GetQuizById), new { id = newQuiz.QuizID }, newQuiz);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [HttpDelete("{id}")]

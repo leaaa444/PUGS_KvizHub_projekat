@@ -38,6 +38,57 @@ namespace KvizHub.Api.Controllers
             return Ok(result);
         }
 
+        [HttpGet("my-results")]
+        public async Task<IActionResult> GetMyResults()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var results = await _resultService.GetMyResultsAsync(userId);
+            return Ok(results);
+        }
+
+        [HttpGet("history/{resultId}")]
+        public async Task<IActionResult> GetArchivedResultDetails(int resultId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            var result = await _resultService.GetArchivedResultDetailsAsync(resultId, userId);
+
+            if (result == null) return NotFound("Rezultat nije pronađen ili nemate pristup.");
+
+            return Ok(result);
+        }
+
+        [HttpGet("progress/{quizId}")]
+        public async Task<IActionResult> GetQuizProgress(int quizId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            var progress = await _resultService.GetQuizProgressAsync(quizId, userId);
+            return Ok(progress);
+        }
+
+        [HttpGet("all-rankings")]
+        public async Task<IActionResult> GetAllRankings([FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
+        {
+            var allRankings = await _resultService.GetAllQuizRankingsAsync(startDate, endDate);
+            return Ok(allRankings);
+        }
+
+
+        [HttpGet("global-ranking")]
+        public async Task<IActionResult> GetGlobalRanking()
+        {
+            var rankings = await _resultService.GetGlobalRankingsAsync();
+            return Ok(rankings);
+        }
+
         [HttpPost]
         public async Task<ActionResult<QuizResultDto>> SubmitQuiz([FromBody] QuizSubmissionDto submissionDto)
         {
