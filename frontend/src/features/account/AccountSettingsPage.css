@@ -1,0 +1,97 @@
+.settings-page {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: var(--background);
+    color: var(--text-color);
+    border-radius: var(--border-radius);
+}
+
+.settings-page h2 {
+    text-align: center;
+    color: var(--foreground);
+    margin-bottom: 2rem;
+}
+
+.settings-section {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--button-color);
+}
+.settings-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.settings-section h3 {
+    margin-bottom: 1rem;
+    color: var(--foreground);
+    font-size: var(--font-size-large);
+}
+
+.settings-section label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: var(--font-weight-bold);
+}
+
+.settings-section input[type="text"],
+.settings-section input[type="email"],
+.settings-section input[type="password"],
+.settings-section input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 1rem;
+    background-color: var(--input-bg);
+    border: 2px solid var(--foreground);
+    border-radius: var(--border-radius);
+    color: var(--input-text);
+    font-size: var(--font-size-base);
+}
+
+.settings-section button {
+    padding: 10px 15px;
+    background-color: var(--foreground);
+    color: var(--button-color);
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: var(--font-weight-bold);
+    transition: filter 0.2s;
+}
+
+.settings-section button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.settings-section button:hover:not(:disabled) {
+    filter: brightness(90%);
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--foreground);
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.message {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+}
+
+.message.success {
+    background-color: #4CAF50; /* Zelena za uspeh */
+    color: white;
+}
+
+.message.error {
+    background-color: var(--danger);
+    color: white;
+}

@@ -4,6 +4,7 @@ using KvizHub.Api.Services.Auth;
 using KvizHub.Api.Services.Category;
 using KvizHub.Api.Services.Question;
 using KvizHub.Api.Services.Quizzes;
+using KvizHub.Api.Services.Result;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;

@@ -4,7 +4,7 @@ using KvizHub.Api.Dtos.Result;
 using KvizHub.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace KvizHub.Api.Services
+namespace KvizHub.Api.Services.Result
 {
     public class ResultService : IResultService
     {
@@ -279,6 +279,48 @@ namespace KvizHub.Api.Services
                 });
 
             return rankedUsers;
+        }
+
+        public async Task<PaginatedResult<AdminResultDto>> GetAllResultsAsync(int pageNumber, int pageSize, string? username, int? quizId)
+        {
+            var query = _context.QuizResults
+                                .Include(qr => qr.User)
+                                .Include(qr => qr.Quiz)
+                                .AsQueryable();
+
+            if (quizId.HasValue)
+            {
+                query = query.Where(qr => qr.QuizID == quizId.Value);
+            }
+            if (!string.IsNullOrEmpty(username))
+            {
+                query = query.Where(qr => qr.User.Username.Contains(username));
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var results = await query
+                .OrderByDescending(qr => qr.DateOfCompletion)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(qr => new AdminResultDto
+                {
+                    ResultId = qr.QuizResultID,
+                    QuizName = qr.Quiz.Name,
+                    Username = qr.User.Username,
+                    Score = qr.Score,
+                    CompletionTime = qr.CompletionTime,
+                    DateOfCompletion = qr.DateOfCompletion
+                })
+                .ToListAsync();
+
+            return new PaginatedResult<AdminResultDto>
+            {
+                Items = results,
+                TotalCount = totalCount,
+                PageSize = pageSize,
+                CurrentPage = pageNumber
+            };
         }
 
         #endregion

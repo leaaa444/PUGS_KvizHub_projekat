@@ -17,6 +17,8 @@ import QuizPage from './features/quiz/QuizPage';
 import QuizResultPage from './features/quizResult/QuizResultPage';
 import MyResultsPage from './features/myResults/MyResultsPage';
 import GlobalResultsPage from './features/globalResults/GlobalResultsPage';
+import AdminResultsPage from './features/dashboard/pages/results/AdminResults';
+import AccountSettingsPage from './features/account/AccountSettingsPage';
 
 function App() {
   return (
@@ -31,12 +33,14 @@ function App() {
           <Route path="/rezultati/:resultId" element={<ProtectedRoute><QuizResultPage /></ProtectedRoute>} /> 
           <Route path="/moji-rezultati" element={<ProtectedRoute><MyResultsPage /></ProtectedRoute>} />
           <Route path="/rang-lista" element={<ProtectedRoute><GlobalResultsPage /></ProtectedRoute>} />
+          <Route path="/nalog" element={<ProtectedRoute><AccountSettingsPage /></ProtectedRoute>} />
           <Route path="/dashboard" element={<AdminRoute><DashboardLayout /></AdminRoute>}>
             <Route index element={<DashboardPage />} />
             <Route path="kvizovi" element={<ManageQuizzesPage />} />
             <Route path="kvizovi/novi" element={<QuizBuilderPage />} />      
             <Route path="kvizovi/edit/:quizId" element={<QuizBuilderPage />}/>
             <Route path="kategorije" element={<ManageCategoriesPage />} />
+            <Route path="rezultati" element={<AdminResultsPage />} />
           </Route>
 
         </Routes>

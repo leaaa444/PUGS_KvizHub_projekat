@@ -1,7 +1,7 @@
 ﻿using KvizHub.Api.Dtos.Quiz;
 using KvizHub.Api.Dtos.Result;
 
-namespace KvizHub.Api.Services
+namespace KvizHub.Api.Services.Result
 {
     public interface IResultService
     {
@@ -16,6 +16,8 @@ namespace KvizHub.Api.Services
         Task<IEnumerable<AllRankingsDto>> GetAllQuizRankingsAsync(DateTime? startDate, DateTime? endDate);
 
         Task<IEnumerable<GlobalRankingDto>> GetGlobalRankingsAsync();
+
+        Task<PaginatedResult<AdminResultDto>> GetAllResultsAsync(int pageNumber, int pageSize, string? username, int? quizId);
 
         Task<QuizResultDto> SubmitQuizAsync(QuizSubmissionDto submissionDto, int userId);
 

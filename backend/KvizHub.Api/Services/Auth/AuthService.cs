@@ -108,6 +108,7 @@ namespace KvizHub.Api.Services.Auth
             {
                 new Claim(ClaimTypes.NameIdentifier, user.UserID.ToString()),
                 new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.UserRole.ToString()),
                 new Claim("profilePictureUrl", user.ProfilePictureUrl ?? string.Empty)
 

@@ -6,6 +6,7 @@ interface User {
   username: string;
   role: string;
   profilePictureUrl: string; 
+  email: string;
 }
 
 interface AuthContextType {
@@ -15,6 +16,7 @@ interface AuthContextType {
   register: (username: string, email: string, password: string, profilePicture: File) => Promise<void>;
   logout: () => void;
   token: string | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 const AuthContext = createContext<AuthContextType>(null!);
@@ -32,7 +34,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser({ 
             username: decodedUser.unique_name, 
             role: decodedUser.role ,
-            profilePictureUrl: decodedUser.profilePictureUrl
+            profilePictureUrl: decodedUser.profilePictureUrl,
+            email: decodedUser.email
           });
         } else {
           logout();
@@ -61,7 +64,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setUser({ 
                 username: decodedUser.unique_name, 
                 role: decodedUser.role,
-                profilePictureUrl: decodedUser.profilePictureUrl
+                profilePictureUrl: decodedUser.profilePictureUrl,
+                email: decodedUser.email
             });
             setToken(newToken);
         }
@@ -77,7 +81,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setToken(null);
   };
 
-  const value = { user, loading, login, register,  logout, token };
+  const value = { user, loading, login, register,  logout, token, setUser  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

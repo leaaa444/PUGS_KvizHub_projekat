@@ -1,0 +1,115 @@
+.admin-results-page {
+    padding: 2rem;
+    max-width: 1000px;
+    margin: 2rem auto;
+    background-color: var(--background); /* Glavna pozadina stranice */
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    color: var(--text-color); /* Osnovna boja teksta */
+}
+
+.admin-results-page h2 {
+    color: var(--foreground); /* Akcentna boja za naslov */
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: var(--font-size-xl);
+}
+
+.filters-container {
+    display: flex;
+    flex-wrap: wrap; /* Omogućava prelamanje na manjim ekranima */
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.filter-input, .filter-select {
+    flex-grow: 1; /* Omogućava im da se rašire */
+    padding: 10px;
+    background-color: var(--input-bg);
+    border: 2px solid var(--foreground);
+    border-radius: var(--border-radius);
+    color: var(--input-text);
+    font-size: var(--font-size-base);
+    font-family: var(--font-family-main);
+    min-width: 200px; /* Minimalna širina za bolji izgled */
+}
+
+.filter-input::placeholder {
+    color: rgba(238, 215, 197, 0.6); /* Svetlija boja za placeholder */
+}
+
+.filter-input:focus, .filter-select:focus {
+    outline: none;
+    border-color: var(--text-color);
+}
+
+.results-table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+th, td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--button-color);
+}
+
+th {
+    background-color: var(--button-color); /* Tamnija pozadina za header tabele */
+    font-weight: var(--font-weight-bold);
+    color: var(--foreground);
+}
+
+tr:hover {
+    background-color: var(--button-color); /* Isticanje reda na hover */
+}
+
+td[colspan="5"] {
+    text-align: center;
+    padding: 2rem;
+    font-style: italic;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    user-select: none; /* Sprečava selektovanje teksta */
+}
+
+.pagination-container button {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    background-color: var(--foreground);
+    color: var(--button-color);
+    border: none;
+    border-radius: var(--border-radius);
+    font-weight: var(--font-weight-bold);
+    transition: filter 0.2s;
+}
+
+.pagination-container button:hover:not(:disabled) {
+    filter: brightness(90%);
+}
+
+.pagination-container button:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+
+.error-message {
+    color: var(--danger);
+    background-color: rgba(169, 68, 66, 0.15);
+    border: 1px solid var(--danger);
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+    margin-top: 1rem;
+}

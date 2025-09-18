@@ -1,6 +1,7 @@
 ﻿using KvizHub.Api.Dtos.Quiz;
 using KvizHub.Api.Dtos.Result;
 using KvizHub.Api.Services;
+using KvizHub.Api.Services.Result;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -81,12 +82,19 @@ namespace KvizHub.Api.Controllers
             return Ok(allRankings);
         }
 
-
         [HttpGet("global-ranking")]
         public async Task<IActionResult> GetGlobalRanking()
         {
             var rankings = await _resultService.GetGlobalRankingsAsync();
             return Ok(rankings);
+        }
+
+        [HttpGet("all-admin-results")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllAdminResults([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? username = null, [FromQuery] int? quizId = null)
+        {
+            var paginatedResults = await _resultService.GetAllResultsAsync(pageNumber, pageSize, username, quizId);
+            return Ok(paginatedResults);
         }
 
         [HttpPost]

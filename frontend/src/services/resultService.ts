@@ -47,6 +47,29 @@ const getGlobalRanking = () => {
   return axios.get(`${API_URL}global-ranking`, { headers: authHeader() });
 };
 
+const getAllAdminResults = (
+    pageNumber: number,
+    pageSize: number,
+    username?: string,
+    quizId?: number
+) => {
+    const params = new URLSearchParams();
+    params.append('pageNumber', pageNumber.toString());
+    params.append('pageSize', pageSize.toString());
+
+    if (username) {
+        params.append('username', username);
+    }
+    if (quizId) {
+        params.append('quizId', quizId.toString());
+    }
+
+    return axios.get(`${API_URL}all-admin-results?${params.toString()}`, { 
+        headers: authHeader() 
+    });
+};
+
+
 const resultService = {
   getResultDetails,
   submitQuiz,
@@ -55,6 +78,8 @@ const resultService = {
   getQuizProgress,
   getAllRankings,
   getGlobalRanking,
+  getAllAdminResults,
+
 };
 
 export default resultService;
