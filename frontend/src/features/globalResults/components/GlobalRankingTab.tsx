@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import resultService from '../../../services/resultService';
 import { useAuth } from '../../../context/AuthContext';
 
@@ -10,13 +10,19 @@ interface GlobalRanking {
     quizzesPlayed: number;
 }
 
-const GlobalRankingTab: React.FC = () => {
+interface GlobalRankingTabProps {
+    startDate?: string;
+    endDate?: string;
+}
+
+const GlobalRankingTab: React.FC<GlobalRankingTabProps> = ({ startDate, endDate }) => { // <-- Prima propse
     const { user } = useAuth();
     const [rankings, setRankings] = useState<GlobalRanking[]>([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        resultService.getGlobalRanking()
+    const fetchRanking = useCallback(() => {
+        setLoading(true);
+        resultService.getGlobalRanking(startDate, endDate)
             .then(response => {
                 setRankings(response.data);
             })
@@ -26,7 +32,11 @@ const GlobalRankingTab: React.FC = () => {
             .finally(() => {
                 setLoading(false);
             });
-    }, []);
+    }, [startDate, endDate]); 
+
+    useEffect(() => {
+        fetchRanking();
+    }, [fetchRanking]);
 
     if (loading) {
         return <p>Učitavanje rang liste...</p>;

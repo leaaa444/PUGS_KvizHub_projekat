@@ -15,7 +15,7 @@ namespace KvizHub.Api.Services.Result
 
         Task<IEnumerable<AllRankingsDto>> GetAllQuizRankingsAsync(DateTime? startDate, DateTime? endDate);
 
-        Task<IEnumerable<GlobalRankingDto>> GetGlobalRankingsAsync();
+        Task<IEnumerable<GlobalRankingDto>> GetGlobalRankingsAsync(DateTime? startDate, DateTime? endDate);
 
         Task<PaginatedResult<AdminResultDto>> GetAllResultsAsync(int pageNumber, int pageSize, string? username, int? quizId);
 

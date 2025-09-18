@@ -17,7 +17,7 @@ namespace KvizHub.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.8")
+                .HasAnnotation("ProductVersion", "9.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -44,7 +44,7 @@ namespace KvizHub.Api.Migrations
 
                     b.HasIndex("QuestionID");
 
-                    b.ToTable("AnswerOptions");
+                    b.ToTable("AnswerOptions", (string)null);
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.Category", b =>
@@ -64,7 +64,7 @@ namespace KvizHub.Api.Migrations
 
                     b.HasKey("CategoryID");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.Question", b =>
@@ -99,7 +99,7 @@ namespace KvizHub.Api.Migrations
 
                     b.HasIndex("QuizID");
 
-                    b.ToTable("Questions");
+                    b.ToTable("Questions", (string)null);
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.Quiz", b =>
@@ -129,7 +129,7 @@ namespace KvizHub.Api.Migrations
 
                     b.HasKey("QuizID");
 
-                    b.ToTable("Quizzes");
+                    b.ToTable("Quizzes", (string)null);
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.QuizCategory", b =>
@@ -144,7 +144,7 @@ namespace KvizHub.Api.Migrations
 
                     b.HasIndex("CategoryID");
 
-                    b.ToTable("QuizCategories");
+                    b.ToTable("QuizCategories", (string)null);
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.QuizResult", b =>
@@ -182,7 +182,7 @@ namespace KvizHub.Api.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("QuizResults");
+                    b.ToTable("QuizResults", (string)null);
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.User", b =>
@@ -220,7 +220,7 @@ namespace KvizHub.Api.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.UserAnswer", b =>
@@ -247,7 +247,7 @@ namespace KvizHub.Api.Migrations
 
                     b.HasIndex("QuizResultID");
 
-                    b.ToTable("UserAnswers");
+                    b.ToTable("UserAnswers", (string)null);
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.UserAnswerSelectedOption", b =>
@@ -262,7 +262,7 @@ namespace KvizHub.Api.Migrations
 
                     b.HasIndex("AnswerOptionId");
 
-                    b.ToTable("UserAnswerSelectedOptions");
+                    b.ToTable("UserAnswerSelectedOptions", (string)null);
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.AnswerOption", b =>

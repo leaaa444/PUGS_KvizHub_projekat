@@ -1,5 +1,6 @@
 using KvizHub.Api.Data;
 using KvizHub.Api.Services;
+using KvizHub.Api.Services.Account;
 using KvizHub.Api.Services.Auth;
 using KvizHub.Api.Services.Category;
 using KvizHub.Api.Services.Question;
@@ -47,6 +48,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IQuizService, QuizService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<IResultService, ResultService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

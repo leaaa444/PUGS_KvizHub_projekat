@@ -10,5 +10,6 @@ namespace KvizHub.Api.Services.Auth
         Task<string?> Login(string loginIdentifier, string password);
         Task<bool> UserExists(string username);
         Task<bool> EmailExists(string email);
+        string CreateToken(User user);
     }
 }

@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import './AccountSettingsPage.css';
 
 const AccountSettingsPage = () => {
-    const { user, setUser } = useAuth();
+    const { user, setUser, setToken } = useAuth();
     
     const [profileData, setProfileData] = useState({ username: '', email: '' });
     const [passwordData, setPasswordData] = useState({ currentPassword: '', newPassword: '', confirmNewPassword: '' });
@@ -30,8 +30,19 @@ const AccountSettingsPage = () => {
         setIsSaving(true);
         setMessage(null);
         try {
-            await accountService.updateProfile(profileData);
-            setUser({ ...user!, username: profileData.username, email: profileData.email });
+            const response = await accountService.updateProfile(profileData);
+            const newToken = response.data.newToken; 
+
+            if (newToken) {
+                localStorage.setItem('user_token', newToken);
+                setToken(newToken);
+                setUser(prevUser => ({
+                ...prevUser!,
+                username: profileData.username,
+                email: profileData.email
+            }));
+            } 
+            
             setMessage({ type: 'success', text: 'Osnovni podaci su uspešno ažurirani!' });
         } catch (err: any) {
             setMessage({ type: 'error', text: err.response?.data?.message || 'Greška pri ažuriranju profila.' });
@@ -66,9 +77,12 @@ const AccountSettingsPage = () => {
         setMessage(null);
         try {
             const response = await accountService.updateProfilePicture(selectedFile);
-            setUser({ ...user!, profilePictureUrl: response.data.newUrl });
+            setUser(prevUser => ({
+                ...prevUser!,
+                profilePictureUrl: response.data.newUrl 
+            }));
             setMessage({ type: 'success', text: 'Profilna slika je uspešno promenjena!' });
-            setSelectedFile(null); // Resetuj selektovani fajl
+            setSelectedFile(null); 
         } catch (err: any) {
             setMessage({ type: 'error', text: 'Greška pri upload-u slike.' });
         } finally {

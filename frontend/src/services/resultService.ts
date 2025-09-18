@@ -43,8 +43,12 @@ const getAllRankings = (startDate?: string, endDate?: string) => {
     return axios.get(`${API_URL}all-rankings?${params.toString()}`, { headers: authHeader() });
 };
 
-const getGlobalRanking = () => {
-  return axios.get(`${API_URL}global-ranking`, { headers: authHeader() });
+const getGlobalRanking = (startDate?: string, endDate?: string) => {
+    const params = new URLSearchParams();
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+
+  return axios.get(`${API_URL}global-ranking?${params.toString()}`, { headers: authHeader() });
 };
 
 const getAllAdminResults = (

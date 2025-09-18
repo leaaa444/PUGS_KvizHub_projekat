@@ -1,4 +1,5 @@
-﻿using KvizHub.Api.Dtos.Account;
+﻿using Azure;
+using KvizHub.Api.Dtos.Account;
 using KvizHub.Api.Services.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -52,8 +53,8 @@ namespace KvizHub.Api.Controllers
 
             try
             {
-                await _accountService.UpdateProfileAsync(userId, dto);
-                return Ok(new { message = "Profil uspešno ažuriran." });
+                var response = await _accountService.UpdateProfileAsync(userId, dto);
+                return Ok(response);
             }
             catch (Exception ex)
             {

@@ -22,14 +22,16 @@ interface SelectOption {
     label: string;
 }
 
-const PerQuizRankingsTab: React.FC = () => {
+interface PerQuizRankingsTabProps {
+    startDate?: string;
+    endDate?: string;
+}
+
+const PerQuizRankingsTab: React.FC<PerQuizRankingsTabProps> = ({ startDate, endDate }) => {
     const { user } = useAuth(); 
     const [rankings, setRankings] = useState<QuizRanking[]>([]);
     
     const [selectedQuiz, setSelectedQuiz] = useState<SelectOption | null>(null);
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
-
     const [loading, setLoading] = useState(true);
 
     const fetchRankings = useCallback(() => {
@@ -39,14 +41,14 @@ const PerQuizRankingsTab: React.FC = () => {
                 const rankingsData: QuizRanking[] = response.data;
                 const processedRankings = rankingsData.map(quizRanking => ({
                     ...quizRanking,
-                    topPlayers: quizRanking.topPlayers.slice(0, 5) // Prikazujemo samo top 5
+                    topPlayers: quizRanking.topPlayers.slice(0, 5) 
                 }));
 
                 setRankings(processedRankings);
             })
             .catch(error => console.error("Greška pri preuzimanju rang listi:", error))
             .finally(() => setLoading(false));
-    }, [startDate, endDate]); // Ova funkcija zavisi od datuma
+    }, [startDate, endDate]); 
 
     const displayedRankings = useMemo(() => {
         if (!selectedQuiz) {
@@ -80,11 +82,6 @@ const PerQuizRankingsTab: React.FC = () => {
                     styles={customSelectStyles}
                     className="quiz-name-filter"
                 />
-                <div className="date-filters">
-                    <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
-                    <span>-</span>
-                    <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
-                </div>
             </div>
             <div className="rankings-grid">
                 {displayedRankings.map(quizRanking => (

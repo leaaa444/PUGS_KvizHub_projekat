@@ -1,78 +1,97 @@
-﻿using KvizHub.Api.Dtos.Account;
-using KvizHub.Api.Models; 
+﻿using KvizHub.Api.Data;
+using KvizHub.Api.Dtos.Account;
+using KvizHub.Api.Models;
+using KvizHub.Api.Services.Auth;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace KvizHub.Api.Services.Account
 {
     public class AccountService : IAccountService
     {
-        private readonly UserManager<User> _userManager;
+        private readonly KvizHubContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IAuthService _authService;
 
-        public AccountService(UserManager<User> userManager, IWebHostEnvironment webHostEnvironment)
+        public AccountService(KvizHubContext context, IWebHostEnvironment webHostEnvironment, IAuthService authService)
         {
-            _userManager = userManager;
+            _context = context;
             _webHostEnvironment = webHostEnvironment;
+            _authService = authService;
         }
 
         public async Task<UserProfileDto> GetUserProfileAsync(string userId)
         {
-            var user = await _userManager.FindByIdAsync(userId);
-
-            if (user == null)
+            if (!int.TryParse(userId, out int id))
             {
-                throw new KeyNotFoundException("Korisnik nije pronađen.");
+                throw new ArgumentException("ID korisnika nije validan.");
             }
 
-            var userProfileDto = new UserProfileDto
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) throw new KeyNotFoundException("Korisnik nije pronađen.");
+
+            return new UserProfileDto
             {
                 Username = user.Username,
                 Email = user.Email,
                 ProfilePictureUrl = user.ProfilePictureUrl
             };
-
-            return userProfileDto;
         }
 
-        public async Task UpdateProfileAsync(string userId, UpdateProfileDto dto)
+        public async Task<UpdateProfileResponseDto> UpdateProfileAsync(string userId, UpdateProfileDto dto)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            if (!int.TryParse(userId, out int id)) throw new ArgumentException("ID korisnika nije validan.");
+
+            var user = await _context.Users.FindAsync(id);
             if (user == null) throw new KeyNotFoundException("Korisnik nije pronađen.");
 
-            var usernameExists = await _userManager.Users.AnyAsync(u => u.Username == dto.Username && u.UserID.ToString() != userId);
+            var usernameExists = await _context.Users.AnyAsync(u => u.Username == dto.Username && u.UserID != id);
             if (usernameExists) throw new InvalidOperationException("Korisničko ime je zauzeto.");
 
-            var emailExists = await _userManager.Users.AnyAsync(u => u.Email == dto.Email && u.UserID.ToString() != userId);
+            var emailExists = await _context.Users.AnyAsync(u => u.Email == dto.Email && u.UserID != id);
             if (emailExists) throw new InvalidOperationException("Email adresa je zauzeta.");
 
             user.Username = dto.Username;
             user.Email = dto.Email;
 
-            var result = await _userManager.UpdateAsync(user);
-            if (!result.Succeeded) throw new Exception("Greška prilikom ažuriranja profila.");
+            await _context.SaveChangesAsync();
+
+            var newToken = _authService.CreateToken(user);
+
+            return new UpdateProfileResponseDto
+            {
+                Message = "Profil uspešno ažuriran.",
+                NewToken = newToken
+            };
         }
 
         public async Task ChangePasswordAsync(string userId, ChangePasswordDto dto)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            if (!int.TryParse(userId, out int id)) throw new ArgumentException("ID korisnika nije validan.");
+
+            var user = await _context.Users.FindAsync(id);
             if (user == null) throw new KeyNotFoundException("Korisnik nije pronađen.");
 
-            var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
-            if (!result.Succeeded)
+            if (!BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, user.HashedPassword))
             {
-                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                throw new InvalidOperationException($"Greška pri promeni lozinke: {errors}");
+                throw new InvalidOperationException("Trenutna lozinka nije tačna.");
             }
+
+            user.HashedPassword = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<string> UpdateProfilePictureAsync(string userId, IFormFile file)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            if (!int.TryParse(userId, out int id))
+            {
+                throw new ArgumentException("ID korisnika nije validan.");
+            }
+            var user = await _context.Users.FindAsync(id);
             if (user == null) throw new KeyNotFoundException("Korisnik nije pronađen.");
 
             if (file == null || file.Length == 0) throw new ArgumentException("Fajl nije poslat.");
@@ -90,7 +109,8 @@ namespace KvizHub.Api.Services.Account
 
             var fileUrl = $"/images/profiles/{uniqueFileName}";
             user.ProfilePictureUrl = fileUrl;
-            await _userManager.UpdateAsync(user);
+
+            await _context.SaveChangesAsync();
 
             return fileUrl;
         }

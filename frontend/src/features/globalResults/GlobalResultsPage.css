@@ -29,11 +29,45 @@
 .tab-button.active::after {
     content: '';
     position: absolute;
-    bottom: -2px; /* Postavlja liniju tačno na border */
+    bottom: -2px; 
     left: 0;
     right: 0;
     height: 2px;
     background-color: var(--foreground);
+}
+
+.time-period-filter {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem; 
+    margin-bottom: 2rem;
+    background-color: var(--button-color); 
+    padding: 0.5rem;
+    border-radius: var(--border-radius);
+    margin-left: 200px;
+    margin-right: 200px;
+}
+
+.time-period-filter button {
+    padding: 0.5rem 1rem;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-color);
+    background-color: transparent; 
+    border: 2px solid transparent;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.time-period-filter button:hover:not(.active) {
+    background-color: var(--background); 
+}
+
+.time-period-filter button.active {
+    background-color: var(--foreground);
+    color: var(--button-color); 
+    box-shadow: 0 0 10px rgba(200, 159, 156, 0.5);
 }
 
 
@@ -142,32 +176,13 @@
     padding: 15px;
     border-radius: var(--border-radius);
     align-content: center;
-    margin-left: 175px;
-    margin-right: 175px;
+    margin-left: 220px;
+    margin-right: 220px;
 }
 
 .quiz-name-filter {
     min-width: 350px;
     font-family: var(--font-family-main);
-}
-
-.date-filters {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.date-filters input[type="date"] {
-    background-color: var(--input-bg);
-    color: var(--input-text);
-    border: 1px solid var(--foreground);
-    border-radius: var(--border-radius);
-    padding: 8px;
-    font-family: var(--font-family-main);
-}
-/* Stil za ikonicu kalendara u Chrome-u */
-input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
 }
 
 .ranking-page-container {

@@ -222,22 +222,31 @@ namespace KvizHub.Api.Services.Result
             return rankingsByQuiz;
         }
 
-        public async Task<IEnumerable<GlobalRankingDto>> GetGlobalRankingsAsync()
+        public async Task<IEnumerable<GlobalRankingDto>> GetGlobalRankingsAsync(DateTime? startDate, DateTime? endDate)
         {
-            var allResults = await _context.QuizResults
-                .Include(qr => qr.User)
-                .Include(qr => qr.Quiz)
+            var query = _context.QuizResults.AsQueryable();
+
+            if (startDate.HasValue)
+            {
+                query = query.Where(r => r.DateOfCompletion.Date >= startDate.Value.Date);
+            }
+            if (endDate.HasValue)
+            {
+                query = query.Where(r => r.DateOfCompletion.Date <= endDate.Value.Date);
+            }
+
+            var bestUserResultsQuery = query
+                .Include(r => r.User)
+                .Include(r => r.Quiz)
                     .ThenInclude(q => q.Questions)
-                .ToListAsync();
-
-            var userScores = new Dictionary<int, List<double>>();
-
-            var bestUserResults = allResults
                 .GroupBy(r => new { r.UserID, r.QuizID })
-                .Select(g => g.OrderByDescending(r => r.Score).ThenBy(r => r.CompletionTime).First());
+                .Select(g => g.OrderByDescending(r => r.Score)
+                               .ThenBy(r => r.CompletionTime)
+                               .First());
+
+            var bestUserResults = await bestUserResultsQuery.ToListAsync();
 
             var resultsByUser = bestUserResults.GroupBy(r => r.User);
-
             var globalScores = new List<(User User, double GlobalScore, int QuizzesPlayed)>();
 
             foreach (var userGroup in resultsByUser)

@@ -102,7 +102,7 @@ namespace KvizHub.Api.Services.Auth
         }
 
 
-        private string CreateToken(User user)
+        public string CreateToken(User user)
         {
             var claims = new List<Claim>
             {

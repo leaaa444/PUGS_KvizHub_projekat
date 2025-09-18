@@ -17,6 +17,7 @@ interface AuthContextType {
   logout: () => void;
   token: string | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  setToken: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const AuthContext = createContext<AuthContextType>(null!);
@@ -81,7 +82,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setToken(null);
   };
 
-  const value = { user, loading, login, register,  logout, token, setUser  };
+  const value = { user, loading, login, register,  logout, token, setUser, setToken  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

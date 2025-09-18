@@ -83,9 +83,9 @@ namespace KvizHub.Api.Controllers
         }
 
         [HttpGet("global-ranking")]
-        public async Task<IActionResult> GetGlobalRanking()
+        public async Task<IActionResult> GetGlobalRanking([FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
         {
-            var rankings = await _resultService.GetGlobalRankingsAsync();
+            var rankings = await _resultService.GetGlobalRankingsAsync(startDate, endDate);
             return Ok(rankings);
         }
 
