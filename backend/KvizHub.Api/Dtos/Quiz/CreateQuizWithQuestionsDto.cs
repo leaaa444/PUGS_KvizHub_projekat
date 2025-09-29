@@ -16,6 +16,8 @@ namespace KvizHub.Api.Dtos.Quiz
         [Required]
         public QuizDifficulty Difficulty { get; set; }
 
+        public QuizMode Mode { get; set; }
+
         public int TimeLimit { get; set; }
 
         [Required]

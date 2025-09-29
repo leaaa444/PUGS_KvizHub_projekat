@@ -1,6 +1,7 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback, useMemo } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import authService from '../services/authService';
+import { startConnection, stopSignalRConnection } from '../services/signalrService';
 
 interface User {
   username: string;
@@ -27,6 +28,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [token, setToken] = useState<string | null>(localStorage.getItem('user_token'));
   const [loading, setLoading] = useState(true);
 
+  const logout = useCallback(() => {
+    localStorage.removeItem('user_token');
+    setUser(null);
+    setToken(null);
+    stopSignalRConnection();
+  }, []);
+
   useEffect(() => {
     try {
       if (token) {
@@ -38,51 +46,51 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             profilePictureUrl: decodedUser.profilePictureUrl,
             email: decodedUser.email
           });
+          startConnection();
         } else {
-          logout();
+          logout();
         }
-      }
+      }else {
+        stopSignalRConnection();
+    }
     } catch (e) {
       logout();
     } finally {
       setLoading(false); 
     }
-  }, [token]);
+  }, [token, logout]);
 
-    const register = async (username: string, email: string, password: string, profilePicture: File) => {
-    await authService.register(username, email, password, profilePicture);
-    await login(username, password); 
-  };
 
-  const login = async (username: string, password: string) => {
+  const login = useCallback(async (username: string, password: string) => {
     try {
-        const response = await authService.login(username, password);
-        
-        if (response.data.token) {
-            const newToken = response.data.token;
-            localStorage.setItem('user_token', newToken);
-            const decodedUser: any = jwtDecode(newToken);
-            setUser({ 
-                username: decodedUser.unique_name, 
-                role: decodedUser.role,
-                profilePictureUrl: decodedUser.profilePictureUrl,
-                email: decodedUser.email
-            });
-            setToken(newToken);
-        }
+      const response = await authService.login(username, password);
+      
+      if (response.data.token) {
+        const newToken = response.data.token;
+        localStorage.setItem('user_token', newToken);
+        setToken(newToken);
+      }
     } catch (error) {
-        console.error("Greška pri prijavi (AuthContext):", error);
-        throw error; 
+      console.error("Greška pri prijavi (AuthContext):", error);
+      throw error;
     }
-  };
+  }, []);
 
-  const logout = () => {
-    localStorage.removeItem('user_token');
-    setUser(null);
-    setToken(null);
-  };
+  const register = useCallback(async (username: string, email: string, password: string, profilePicture: File) => {
+    await authService.register(username, email, password, profilePicture);
+    await login(username, password);
+  }, [login]);
 
-  const value = { user, loading, login, register,  logout, token, setUser, setToken  };
+  const value = useMemo(() => ({
+    user,
+    loading,
+    login,
+    register,
+    logout,
+    token,
+    setUser,
+    setToken
+  }), [user, loading, login, register, logout, token]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

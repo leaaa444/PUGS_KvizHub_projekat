@@ -23,6 +23,8 @@ namespace KvizHub.Api.Models
 
 		public string CorrectTextAnswer { get; set; } = string.Empty;
 
+        public int? TimeLimitSeconds { get; set; }
+
         public bool IsArchived { get; set; } = false;
 
         public virtual List<AnswerOption> AnswerOptions { get; set; } = new();

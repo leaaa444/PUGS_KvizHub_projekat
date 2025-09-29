@@ -1,3 +1,4 @@
+using KvizHub.Api.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -15,6 +16,8 @@ namespace KvizHub.Api.Models
 
         [ForeignKey("Quiz")]
         public int QuizID { get; set; }
+
+        public QuizMode Mode { get; set; }
 
         public int CompletionTime { get; set; }
 

@@ -8,6 +8,7 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { user, loading } = useAuth();
+  console.log(`[ProtectedRoute] Stanje -> Loading: ${loading}, Korisnik postoji: ${!!user}`);
 
   if (loading) {
     return <div>Učitavanje...</div>;

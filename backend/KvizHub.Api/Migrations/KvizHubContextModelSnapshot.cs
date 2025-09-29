@@ -44,7 +44,7 @@ namespace KvizHub.Api.Migrations
 
                     b.HasIndex("QuestionID");
 
-                    b.ToTable("AnswerOptions", (string)null);
+                    b.ToTable("AnswerOptions");
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.Category", b =>
@@ -64,7 +64,125 @@ namespace KvizHub.Api.Migrations
 
                     b.HasKey("CategoryID");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("KvizHub.Api.Models.GameRoom", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CurrentQuestionIndex")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CurrentQuestionStartTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("HostDisconnectedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("HostUsername")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("QuizId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RoomCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuizId");
+
+                    b.ToTable("GameRooms");
+                });
+
+            modelBuilder.Entity("KvizHub.Api.Models.LiveQuizParticipant", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("DisconnectedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("GameRoomId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Score")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameRoomId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("LiveQuizParticipants");
+                });
+
+            modelBuilder.Entity("KvizHub.Api.Models.ParticipantAnswer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AnswerTimeMilliseconds")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsCorrect")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ParticipantId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PointsAwarded")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SubmittedAnswer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParticipantId");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("ParticipantAnswers");
+                });
+
+            modelBuilder.Entity("KvizHub.Api.Models.ParticipantSelectedOption", b =>
+                {
+                    b.Property<int>("ParticipantAnswerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AnswerOptionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ParticipantAnswerId", "AnswerOptionId");
+
+                    b.HasIndex("AnswerOptionId");
+
+                    b.ToTable("ParticipantSelectedOptions");
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.Question", b =>
@@ -92,6 +210,9 @@ namespace KvizHub.Api.Migrations
                     b.Property<int>("QuizID")
                         .HasColumnType("int");
 
+                    b.Property<int?>("TimeLimitSeconds")
+                        .HasColumnType("int");
+
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
@@ -99,7 +220,7 @@ namespace KvizHub.Api.Migrations
 
                     b.HasIndex("QuizID");
 
-                    b.ToTable("Questions", (string)null);
+                    b.ToTable("Questions");
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.Quiz", b =>
@@ -120,6 +241,9 @@ namespace KvizHub.Api.Migrations
                     b.Property<bool>("IsArchived")
                         .HasColumnType("bit");
 
+                    b.Property<int>("Mode")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -129,7 +253,7 @@ namespace KvizHub.Api.Migrations
 
                     b.HasKey("QuizID");
 
-                    b.ToTable("Quizzes", (string)null);
+                    b.ToTable("Quizzes");
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.QuizCategory", b =>
@@ -144,7 +268,7 @@ namespace KvizHub.Api.Migrations
 
                     b.HasIndex("CategoryID");
 
-                    b.ToTable("QuizCategories", (string)null);
+                    b.ToTable("QuizCategories");
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.QuizResult", b =>
@@ -167,6 +291,9 @@ namespace KvizHub.Api.Migrations
                     b.Property<DateTime>("DateOfCompletion")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Mode")
+                        .HasColumnType("int");
+
                     b.Property<int>("QuizID")
                         .HasColumnType("int");
 
@@ -182,7 +309,7 @@ namespace KvizHub.Api.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("QuizResults", (string)null);
+                    b.ToTable("QuizResults");
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.User", b =>
@@ -220,7 +347,7 @@ namespace KvizHub.Api.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.UserAnswer", b =>
@@ -247,7 +374,7 @@ namespace KvizHub.Api.Migrations
 
                     b.HasIndex("QuizResultID");
 
-                    b.ToTable("UserAnswers", (string)null);
+                    b.ToTable("UserAnswers");
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.UserAnswerSelectedOption", b =>
@@ -262,7 +389,7 @@ namespace KvizHub.Api.Migrations
 
                     b.HasIndex("AnswerOptionId");
 
-                    b.ToTable("UserAnswerSelectedOptions", (string)null);
+                    b.ToTable("UserAnswerSelectedOptions");
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.AnswerOption", b =>
@@ -274,6 +401,74 @@ namespace KvizHub.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("KvizHub.Api.Models.GameRoom", b =>
+                {
+                    b.HasOne("KvizHub.Api.Models.Quiz", "Quiz")
+                        .WithMany()
+                        .HasForeignKey("QuizId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Quiz");
+                });
+
+            modelBuilder.Entity("KvizHub.Api.Models.LiveQuizParticipant", b =>
+                {
+                    b.HasOne("KvizHub.Api.Models.GameRoom", "GameRoom")
+                        .WithMany("Participants")
+                        .HasForeignKey("GameRoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("KvizHub.Api.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GameRoom");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("KvizHub.Api.Models.ParticipantAnswer", b =>
+                {
+                    b.HasOne("KvizHub.Api.Models.LiveQuizParticipant", "Participant")
+                        .WithMany("Answers")
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("KvizHub.Api.Models.Question", "Question")
+                        .WithMany()
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Participant");
+
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("KvizHub.Api.Models.ParticipantSelectedOption", b =>
+                {
+                    b.HasOne("KvizHub.Api.Models.AnswerOption", "AnswerOption")
+                        .WithMany()
+                        .HasForeignKey("AnswerOptionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("KvizHub.Api.Models.ParticipantAnswer", "ParticipantAnswer")
+                        .WithMany("SelectedOptions")
+                        .HasForeignKey("ParticipantAnswerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AnswerOption");
+
+                    b.Navigation("ParticipantAnswer");
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.Question", b =>
@@ -366,6 +561,21 @@ namespace KvizHub.Api.Migrations
             modelBuilder.Entity("KvizHub.Api.Models.Category", b =>
                 {
                     b.Navigation("QuizCategories");
+                });
+
+            modelBuilder.Entity("KvizHub.Api.Models.GameRoom", b =>
+                {
+                    b.Navigation("Participants");
+                });
+
+            modelBuilder.Entity("KvizHub.Api.Models.LiveQuizParticipant", b =>
+                {
+                    b.Navigation("Answers");
+                });
+
+            modelBuilder.Entity("KvizHub.Api.Models.ParticipantAnswer", b =>
+                {
+                    b.Navigation("SelectedOptions");
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.Question", b =>

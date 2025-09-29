@@ -45,7 +45,7 @@ const QuizListPage: React.FC = () => {
 
     const fetchQuizzes = async () => {
       try {
-        const response = await quizService.getQuizzes();
+        const response = await quizService.getSoloQuizzes();
         setAllQuizzes(response.data);
         setFilteredQuizzes(response.data);
       } catch (err) {

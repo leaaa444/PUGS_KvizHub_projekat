@@ -1,0 +1,279 @@
+.quiz-page-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: var(--background);
+    border-radius: var(--border-radius);
+    color: var(--text-color);
+    box-shadow: var(--box-shadow);
+    display: flex;           
+    flex-direction: column; 
+}
+
+.quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--button-color);
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+
+.quiz-header h2 {
+    margin: 0;
+    color: var(--foreground);
+}
+
+.quiz-timer {
+    font-size: 1.5rem;
+    font-weight: bold;
+    background-color: var(--button-color);
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+}
+
+.game-area {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.question-display {
+    width: 100%; 
+}
+
+.leaderboard {
+    width: 100%;
+    background-color: var(--input-bg);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.leaderboard h3 {
+    margin-top: 0;
+    text-align: center;
+    border-bottom: 1px solid var(--button-color);
+    padding-bottom: 0.75rem;
+    margin-bottom: 0; /* Uklanjamo donju marginu da bi se gap primenio */
+}
+
+.leaderboard ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem; /* Razmak između igrača */
+}
+
+/* NOVO: Stil za svaku stavku (igrača) u listi */
+.player-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--button-color); /* Tamnija pozadina za kontrast */
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius-small);
+    transition: transform 0.2s ease;
+}
+
+.player-item:hover {
+    transform: scale(1.02);
+}
+
+/* NOVO: Specijalni stil za prijavljenog korisnika */
+.player-item.highlight {
+    background-color: var(--foreground); /* Boja za isticanje */
+    color: var(--background);
+}
+
+/* NOVO: Kontejner za rank, avatar i ime */
+.player-info {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem; /* Povećavamo razmak za bolju preglednost */
+}
+
+/* Pronađi postojeću .player-rank klasu i zameni je ovom */
+.player-rank {
+    font-weight: bold;
+    min-width: 20px; /* Malo smanjujemo da ime ima više mesta */
+    color: var(--text-color);
+    opacity: 0.7; /* Činimo ga malo suptilnijim */
+}
+
+/* Pronađi postojeću .player-item.highlight klasu i zameni je ovom */
+.player-item.highlight {
+    background-color: var(--foreground);
+    color: var(--background);
+}
+
+/* Potrebno je i ovo dodati da se boja rank-a promeni na highlight-ovanom itemu */
+.player-item.highlight .player-rank {
+    color: var(--background);
+    opacity: 1;
+}
+.player-item.disconnected {
+    opacity: 0.5;
+    background-color: #3a2236; /* Malo drugačija pozadina da se razlikuje */
+    border: 1px dashed #6a4a64;
+}
+
+/* Pronađi postojeću .player-score klasu i zameni je ovom */
+.player-score {
+    font-weight: bold;
+    font-size: 1.1rem;
+    white-space: nowrap; /* Sprečava prelamanje teksta "poena" */
+}
+
+/* NOVO: Placeholder za avatar */
+.player-avatar-img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover; /* Osigurava da slika lepo popuni krug bez distorzije */
+    border: 2px solid var(--button-color); /* Opcioni okvir oko slike */
+}
+
+.player-item.highlight .player-avatar-img {
+    border-color: var(--background); /* Menjamo boju okvira na highlight-u */
+}
+
+
+.player-name {
+    font-weight: 500;
+}
+
+
+/* --- Stilovi za Pitanja (LiveQuestionArea) --- */
+
+.question-area-container {
+    background-color: var(--background);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+}
+
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: var(--foreground);
+    margin-bottom: 1rem;
+}
+
+.question-text {
+    font-size: 1.75rem;
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.options-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.option-btn {
+    width: 100%;
+    padding: 1.5rem;
+    background-color: var(--button-color);
+    border: 2px solid transparent;
+    color: var(--text-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: all 0.2s;
+}
+
+.option-btn:hover {
+    border-color: var(--foreground);
+}
+
+.option-btn.selected {
+    background-color: var(--foreground);
+    color: var(--background);
+    border-color: var(--foreground);
+}
+
+.fill-in-blank-container input {
+    width: 100%;
+    padding: 1rem;
+    background-color: var(--input-bg);
+    border: 1px solid var(--button-color);
+    color: var(--input-text);
+    border-radius: var(--border-radius);
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.submit-answer-wrapper {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.submit-answer-btn {
+     background-color: var(--foreground);
+    color: var(--button-color);
+    border: none;
+    padding: 12px 30px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.1rem;
+    transition: transform 0.2s;
+}
+
+.submit-answer-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.submit-answer-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+}
+
+/* --- Stilovi za Kraj Igre --- */
+.quiz-finished-container {
+    text-align: center;
+}
+
+.final-leaderboard {
+    max-width: 400px;
+    margin: 2rem auto;
+}
+
+.final-leaderboard ul {
+    list-style: none;
+    padding: 0;
+}
+
+.final-leaderboard li {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem;
+    background-color: var(--input-bg);
+    border-radius: var(--border-radius-small);
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.exit-quiz-btn {
+    background-color: #c44545; 
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+        align-self: flex-end; 
+    margin-bottom: 1rem; 
+}
+
+.exit-quiz-btn:hover {
+    background-color: #a13434; 
+}

@@ -10,6 +10,7 @@ namespace KvizHub.Api.Dtos.Question
         public string QuestionText { get; set; } = string.Empty;
         public QuestionType Type { get; set; }
         public double PointNum { get; set; }
+        public int? TimeLimitSeconds { get; set; }
         public List<AnswerOptionForQuizTakerDto> AnswerOptions { get; set; } = new();
     }
 }

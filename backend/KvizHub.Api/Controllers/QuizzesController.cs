@@ -24,10 +24,17 @@ namespace KvizHub.Api.Controllers
             _questionService = questionService; 
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetQuizzes()
+        [HttpGet("solo")]
+        public async Task<IActionResult> GetSoloQuizzes()
         {
-            var quizzes = await _quizService.GetQuizzesAsync();
+            var quizzes = await _quizService.GetSoloQuizzesAsync();
+            return Ok(quizzes);
+        }
+
+        [HttpGet("live")]
+        public async Task<IActionResult> GetLiveQuizzes()
+        {
+            var quizzes = await _quizService.GetLiveQuizzesAsync();
             return Ok(quizzes);
         }
 

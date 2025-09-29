@@ -1,0 +1,187 @@
+.lobby-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: var(--background);
+    border-radius: var(--border-radius);
+    color: var(--text-color);
+    box-shadow: var(--box-shadow);
+    text-align: center;
+}
+
+.lobby-container h2 {
+    color: var(--foreground);
+    margin-bottom: 0.5rem;
+}
+
+.lobby-container h3 {
+    border-top: 1px solid var(--button-color);
+    padding-top: 1rem;
+    margin-top: 2rem;
+}
+
+.lobby-container ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 2rem;
+}
+
+.lobby-container li {
+    background-color: var(--input-bg);
+    padding: 0.75rem;
+    border-radius: var(--border-radius-small);
+    margin-bottom: 0.5rem;
+}
+
+.lobby-container button {
+    background-color: var(--foreground);
+    color: var(--button-color);
+    border: none;
+    padding: 12px 30px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.1rem;
+    transition: transform 0.2s;
+}
+
+.lobby-container button:hover {
+    transform: scale(1.05);
+}
+
+.lobby-container {
+    max-width: 500px;
+    margin: 3rem auto;
+    padding: 2.5rem;
+    background-color: var(--background);
+    border-radius: var(--border-radius);
+    color: var(--text-color);
+    box-shadow: var(--box-shadow);
+    text-align: center;
+    border: 1px solid var(--button-color);
+}
+
+.lobby-header {
+    margin-bottom: 2rem;
+}
+
+.lobby-header h3 {
+    margin: 0 0 0.5rem 0;
+    font-weight: normal;
+    color: var(--foreground-light);
+}
+
+.room-code-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    background-color: var(--input-bg);
+    padding: 0.75rem;
+    border-radius: var(--border-radius-small);
+}
+
+.room-code-display {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--foreground);
+    letter-spacing: 4px;
+}
+
+.copy-btn {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    background-color: var(--button-color);
+    border: none;
+    color: var(--text-color);
+    border-radius: var(--border-radius-small);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.copy-btn:hover {
+    background-color: #4a2a46;
+}
+.host-info {
+    background-color: rgba(0,0,0, 0.2);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 2rem;
+    border-left: 4px solid var(--foreground);
+}
+
+.host-info h4 {
+    margin: 0;
+    font-size: 0.8rem;
+    font-weight: normal;
+    color: var(--foreground-light);
+    text-align: left;
+    text-transform: uppercase;
+}
+
+.host-info p {
+    margin: 0.25rem 0 0 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: left;
+}
+
+.player-list-wrapper {
+    margin-bottom: 2rem;
+}
+
+.player-list-wrapper h3 {
+    margin-bottom: 1rem;
+    color: var(--foreground);
+}
+
+.player-list {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+}
+
+.player-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--input-bg);
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius-small);
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.player-tag {
+    font-style: italic;
+    color: var(--foreground-light);
+    font-size: 0.9rem;
+}
+
+.lobby-actions {
+    border-top: 1px solid var(--button-color);
+    padding-top: 2rem;
+    margin-top: 2rem;
+}
+
+.start-game-btn {
+    background-color: var(--foreground);
+    color: var(--button-color);
+    border: none;
+    padding: 15px 40px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    transition: transform 0.2s;
+}
+
+.start-game-btn:hover {
+    transform: scale(1.05);
+}
+
+.wait-message {
+    color: var(--foreground-light);
+    font-style: italic;
+}

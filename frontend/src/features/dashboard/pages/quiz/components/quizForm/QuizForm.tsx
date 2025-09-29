@@ -6,6 +6,7 @@ import './QuizForm.css';
 interface QuizFormProps {
   quizData: any;
   onDataChange: (field: string, value: any) => void;
+  mode?: 'solo' | 'live';
 }
 
 interface Category {
@@ -13,7 +14,7 @@ interface Category {
   name: string;
 }
 
-const QuizForm: React.FC<QuizFormProps> = ({ quizData, onDataChange }) => {
+const QuizForm: React.FC<QuizFormProps> = ({ quizData, onDataChange, mode }) => {
   const [allCategories, setAllCategories] = useState([]);
 
   useEffect(() => {
@@ -52,16 +53,18 @@ const QuizForm: React.FC<QuizFormProps> = ({ quizData, onDataChange }) => {
         />
       </div>
 
-      <div className="quiz-form-group">
-        <label>Vreme (u sekundama)</label>
-        <input 
-          type="number" 
-          value={quizData.timeLimit || 300} 
-          onChange={e => onDataChange('timeLimit', parseInt(e.target.value))} 
-          required
-        />
-      </div>
-
+      {mode === 'solo' && (
+        <div className="quiz-form-group">
+          <label>Vreme (u sekundama)</label>
+          <input 
+            type="number" 
+            value={quizData.timeLimit || 300} 
+            onChange={e => onDataChange('timeLimit', parseInt(e.target.value))} 
+            required
+          />
+        </div>
+      )}
+      
       <div className="quiz-form-group">
         <label>Težina</label>
         <select 

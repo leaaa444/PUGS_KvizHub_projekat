@@ -20,6 +20,8 @@ namespace KvizHub.Api.Models
 
         public bool IsArchived { get; set; } = false;
 
+        public QuizMode Mode { get; set; } = QuizMode.Solo;
+
         public virtual List<Question> Questions { get; set; } = new();
     
         public virtual List<QuizCategory> QuizCategories { get; set; } = new();

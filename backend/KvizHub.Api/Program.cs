@@ -1,8 +1,10 @@
 using KvizHub.Api.Data;
+using KvizHub.Api.Hubs;
 using KvizHub.Api.Services;
 using KvizHub.Api.Services.Account;
 using KvizHub.Api.Services.Auth;
 using KvizHub.Api.Services.Category;
+using KvizHub.Api.Services.LiveQuiz;
 using KvizHub.Api.Services.Question;
 using KvizHub.Api.Services.Quizzes;
 using KvizHub.Api.Services.Result;
@@ -22,26 +24,28 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: myAllowSpecificOrigins,
         policy =>
         {
-            policy.AllowAnyOrigin()
+            policy.WithOrigins("http://localhost:3000")
                   .AllowAnyHeader()
-                  .AllowAnyMethod();
+                  .AllowAnyMethod()
+                  .AllowCredentials();
         });
 });
 
 builder.Services.AddDbContext<KvizHubContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+    o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+);
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-    });
-
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
     //  sve enum-e pretvori u stringove prilikom slanja JSON-a
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-});
+    });
+
+
+builder.Services.AddSignalR();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -49,6 +53,7 @@ builder.Services.AddScoped<IQuizService, QuizService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<IResultService, ResultService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddSingleton<ILiveGameManager, LiveGameManager>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -56,6 +61,22 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) &&
+                    (path.StartsWithSegments("/quizhub"))) 
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            }
+        };
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
@@ -97,5 +118,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<QuizHub>("/quizhub");
 
 app.Run();

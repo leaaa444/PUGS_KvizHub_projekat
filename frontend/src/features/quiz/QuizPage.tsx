@@ -116,6 +116,7 @@ const QuizPage: React.FC = () => {
                     totalQuestions={quizData.questions.length}
                     currentAnswer={userAnswers[currentQuestion.questionId]}
                     onAnswerChange={handleAnswerChange}
+                    showOptions = {true}
                 />
 
                 <QuizNavigation

@@ -12,8 +12,12 @@ export interface QuizListData {
   categories: string[]; 
 }
 
-const getQuizzes = () => {
-  return axios.get(API_URL, { headers: authHeader() });
+const getSoloQuizzes = () => {
+    return axios.get(API_URL + 'solo', { headers: authHeader() });
+};
+
+const getLiveQuizzes = () => {
+    return axios.get(API_URL + 'live', { headers: authHeader() });
 };
 
 const getQuestionsForQuiz = (quizId: number) => {
@@ -46,7 +50,8 @@ const archiveAndCreateNew = (id: number, quizData: any) => {
 
 
 const quizService = {
-  getQuizzes,
+  getSoloQuizzes, 
+  getLiveQuizzes,
   getQuestionsForQuiz,
   createQuizWithQuestions,
   deleteQuiz,

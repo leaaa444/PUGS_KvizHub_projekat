@@ -26,9 +26,10 @@ interface QuestionFormProps {
   onRemove: (questionIndex: number) => void;
   questionIndex: number;
   onAddOption: () => void;
+  mode?: 'solo' | 'live';
 }
 
-const QuestionForm: React.FC<QuestionFormProps> = ({ questionData, questionIndex, onDataChange, onRemove, onAddOption }) => {
+const QuestionForm: React.FC<QuestionFormProps> = ({ questionData, questionIndex, onDataChange, onRemove, onAddOption, mode  }) => {
   const [displayValue, setDisplayValue] = useState(String(questionData.pointNum || '').replace('.', ','));
   const [isTypeMenuOpen, setTypeMenuOpen] = useState(false);
 
@@ -111,6 +112,29 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ questionData, questionIndex
     setTypeMenuOpen(false);
   };
 
+  const handlePointsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (/^[0-9]*[,.]?[0-9]*$/.test(value)) {
+      setDisplayValue(value); 
+    }
+  };
+
+  const handlePointsBlur = () => {
+    let finalValue = parseFloat(displayValue.replace(',', '.'));
+    
+    const isLiveMode = mode === 'live';
+    const minPoints = isLiveMode ? 100 : 0.5;
+    const maxPoints = isLiveMode ? 1000 : 10;
+
+    if (isNaN(finalValue) || finalValue < minPoints) {
+        finalValue = minPoints;
+    } else if (finalValue > maxPoints) {
+        finalValue = maxPoints;
+    }
+    
+    handleChange('pointNum', finalValue);
+};
+
   return (
     <div className="question-form-card">
       <div className="question-form-header">
@@ -146,7 +170,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ questionData, questionIndex
             <input type="text" value={questionData.correctTextAnswer || ''} onChange={e => handleChange('correctTextAnswer', e.target.value)} required />
           </div>
       )}
-
+      
       {questionData.type < 3 && (
         <div className="question-form-group">
           <label>Ponuđeni odgovori</label>
@@ -183,34 +207,35 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ questionData, questionIndex
             )}
         </div>
       )}
-
+      
       <div className="question-form-footer">
-        <div className="points-input-group">
-            <label htmlFor={`points-${questionIndex}`}>Broj bodova</label>
-            <input
-                id={`points-${questionIndex}`}
-                type="text"
-                className="points-input"
-                value={displayValue}
-                onChange={(e) => {
-                    const value = e.target.value;
-                    if (/^[0-9]*[,.]?[0-9]*$/.test(value)) {
-                        setDisplayValue(value); 
-                    }
-                }}
-                onBlur={() => {
-                    let finalValue = parseFloat(displayValue.replace(',', '.'));
-                    if (isNaN(finalValue) || finalValue < 0.5) {
-                        finalValue = 0.5;
-                    } else if (finalValue > 10) {
-                        finalValue = 10;
-                    }
-                    handleChange('pointNum', finalValue);
-                }}
-            />
-        </div>
-      </div>
-    </div>
+        {mode === 'live' && (
+          <div className="time-input-group"> 
+            <label htmlFor={`time-${questionIndex}`}>Vreme (s)</label>
+            <input
+              id={`time-${questionIndex}`}
+              type="number"
+              className="time-input"
+              placeholder="15"
+              value={questionData.timeLimitSeconds || ''}
+              onChange={e => handleChange('timeLimitSeconds', parseInt(e.target.value))}
+              required
+            />
+          </div>
+        )}
+        <div className="points-input-group">
+          <label htmlFor={`points-${questionIndex}`}>Broj bodova</label>
+          <input 
+            id={`points-${questionIndex}`}
+            type="text"
+            className="points-input"
+            value={displayValue}
+            onChange={handlePointsChange}  
+            onBlur={handlePointsBlur}      
+          />
+        </div>
+      </div>
+    </div>
   );
 };
 

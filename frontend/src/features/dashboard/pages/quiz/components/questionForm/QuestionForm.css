@@ -262,27 +262,42 @@
 
 .question-form-footer {
     display: flex;
-    justify-content: flex-end; 
+    justify-content: space-between; /* Ključna stvar za raspored */
+    align-items: center;          /* Da budu vertikalno centrirani kao u headeru */
+    width: 100%;                  /* Ovo ostaje od ranije, bitno je */
     margin-top: 1.5rem;
     padding-top: 1rem;
     border-top: 1px solid var(--button-color); 
 }
 
-.points-input-group {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
+.time-input-group,
+.points-input-group   {
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
+.time-input-group   {
+  margin-left: 15px;
+}
+
+.points-input-group   {
+  margin-right: 15px;
+}
+
+.time-input-group label,
 .points-input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
     font-weight: var(--font-weight-bold);
     color: var(--text-color);
     opacity: 0.9;
+    text-align: center;
 }
 
+.time-input,
 .points-input {
     width: 80px; 
-    padding: 8px 12px;
+    padding: 8px;
     background-color: var(--button-color);
     border: 2px solid var(--background);
     border-radius: var(--border-radius);
@@ -292,12 +307,15 @@
     transition: all 0.2s ease-in-out;
 }
 
+.time-input:focus,
 .points-input:focus {
     outline: none;
     border-color: var(--foreground);
     box-shadow: 0 0 0 4px rgba(200, 159, 156, 0.5);
 }
 
+.time-input::-webkit-outer-spin-button,
+.time-input::-webkit-inner-spin-button,
 .points-input::-webkit-outer-spin-button,
 .points-input::-webkit-inner-spin-button {
   -webkit-appearance: none;

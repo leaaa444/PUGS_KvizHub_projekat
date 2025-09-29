@@ -5,6 +5,7 @@ using KvizHub.Api.Dtos.Question;
 using KvizHub.Api.Dtos.Quiz;
 using KvizHub.Api.Dtos.Result;
 using KvizHub.Api.Models;
+using KvizHub.Api.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace KvizHub.Api.Services.Quizzes
@@ -24,10 +25,32 @@ namespace KvizHub.Api.Services.Quizzes
         }
 
         #region GET
-        public async Task<IEnumerable<QuizListDto>> GetQuizzesAsync()
+        public async Task<IEnumerable<QuizListDto>> GetSoloQuizzesAsync()
         {
             return await _context.Quizzes
-                .Where(q => !q.IsArchived)
+                .Where(q => !q.IsArchived && (q.Mode == QuizMode.Solo))
+                .Include(q => q.QuizCategories)
+                    .ThenInclude(qc => qc.Category)
+                .Include(q => q.Questions)
+                .OrderByDescending(q => q.QuizResults.Count())
+                .Select(q => new QuizListDto
+                {
+                    QuizID = q.QuizID,
+                    Name = q.Name,
+                    Description = q.Description,
+                    Difficulty = q.Difficulty.ToString(),
+                    TimesCompleted = q.QuizResults.Count(),
+                    MaxPoints = q.Questions.Sum(p => p.PointNum),
+                    NumberOfQuestions = q.Questions.Count(),
+                    TimeLimit = q.TimeLimit,
+                    Categories = q.QuizCategories.Select(qc => qc.Category.Name).ToList()
+                }).ToListAsync();
+        }
+
+        public async Task<IEnumerable<QuizListDto>> GetLiveQuizzesAsync()
+        {
+            return await _context.Quizzes
+                .Where(q => !q.IsArchived && (q.Mode == QuizMode.Live))
                 .Include(q => q.QuizCategories)
                     .ThenInclude(qc => qc.Category)
                 .Include(q => q.Questions)
@@ -65,6 +88,7 @@ namespace KvizHub.Api.Services.Quizzes
                 Description = quiz.Description,
                 Difficulty = quiz.Difficulty.ToString(),
                 TimeLimit = quiz.TimeLimit,
+                Mode = quiz.Mode.ToString(),
                 Categories = quiz.QuizCategories.Select(qc => new CategoryDto
                 {
                     CategoryID = qc.Category.CategoryID,
@@ -93,6 +117,7 @@ namespace KvizHub.Api.Services.Quizzes
                         QuestionText = p.QuestionText,
                         Type = p.Type,
                         PointNum = p.PointNum,
+                        TimeLimitSeconds = p.TimeLimitSeconds,
                         AnswerOptions = p.AnswerOptions.Select(ao => new AnswerOptionForQuizTakerDto
                         {
                             AnswerOptionId = ao.AnswerOptionID,
@@ -114,7 +139,8 @@ namespace KvizHub.Api.Services.Quizzes
                 Name = dto.Name,
                 Description = dto.Description,
                 Difficulty = dto.Difficulty,
-                TimeLimit = dto.TimeLimit
+                TimeLimit = dto.TimeLimit,
+                Mode = dto.Mode
             };
 
             var categories = await _context.Categories
@@ -132,6 +158,7 @@ namespace KvizHub.Api.Services.Quizzes
                     Type = questionDto.Type,
                     PointNum = questionDto.PointNum,
                     CorrectTextAnswer = questionDto.CorrectTextAnswer ?? string.Empty,
+                    TimeLimitSeconds = questionDto.TimeLimitSeconds,
                     Quiz = newQuiz 
                 };
 
@@ -156,6 +183,7 @@ namespace KvizHub.Api.Services.Quizzes
                 Description = newQuiz.Description,
                 Difficulty = newQuiz.Difficulty.ToString(),
                 TimeLimit = newQuiz.TimeLimit,
+                Mode = newQuiz.Mode.ToString(),
                 Categories = newQuiz.QuizCategories.Select(qc => new CategoryDto
                 {
                     CategoryID = qc.Category.CategoryID,
@@ -300,7 +328,6 @@ namespace KvizHub.Api.Services.Quizzes
         {
             var questionIdsFromDto = dto.Questions.Where(q => q.QuestionID > 0).Select(q => q.QuestionID).ToList();
 
-
             var questionsToDelete = quiz.Questions
                 .Where(dbQ => !questionIdsFromDto.Contains(dbQ.QuestionID))
                 .ToList();
@@ -318,7 +345,8 @@ namespace KvizHub.Api.Services.Quizzes
                         QuestionText = questionDto.QuestionText,
                         Type = questionDto.Type,
                         PointNum = questionDto.PointNum,
-                        CorrectTextAnswer = questionDto.CorrectTextAnswer ?? string.Empty
+                        CorrectTextAnswer = questionDto.CorrectTextAnswer ?? string.Empty,
+                        TimeLimitSeconds = questionDto.TimeLimitSeconds
                     };
 
                     foreach (var answerDto in questionDto.AnswerOptions)
@@ -340,6 +368,7 @@ namespace KvizHub.Api.Services.Quizzes
                         dbQuestion.Type = questionDto.Type;
                         dbQuestion.PointNum = questionDto.PointNum;
                         dbQuestion.CorrectTextAnswer = questionDto.CorrectTextAnswer ?? string.Empty;
+                        dbQuestion.TimeLimitSeconds = questionDto.TimeLimitSeconds;
 
                         UpdateAnswerOptions(dbQuestion, questionDto.AnswerOptions);
                     }

@@ -13,6 +13,7 @@ namespace KvizHub.Api.Dtos.Question
         public double PointNum { get; set; } = 1;
         public QuestionType Type { get; set; }
         public string? CorrectTextAnswer { get; set; }
+        public int? TimeLimitSeconds { get; set; }
 
         public List<CreateAnswerOptionDto> AnswerOptions { get; set; } = new();
     }

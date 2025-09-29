@@ -68,7 +68,7 @@ const AdminResultsPage = () => {
     useEffect(() => {
         const fetchQuizzesForFilter = async () => {
             try {
-                const response = await quizService.getQuizzes();
+                const response = await quizService.getSoloQuizzes();
                 setQuizzes(response.data);
             } catch (err) {
                 console.error("Greška pri dohvatanju kvizova za filter", err);

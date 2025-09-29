@@ -45,6 +45,27 @@ namespace KvizHub.Api.Data
                 .WithMany() // Pošto Question nema listu UserAnswer-a, WithMany() je prazan
                 .HasForeignKey(ua => ua.QuestionID)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ParticipantSelectedOption>()
+                .HasKey(pso => new { pso.ParticipantAnswerId, pso.AnswerOptionId });
+
+            modelBuilder.Entity<ParticipantSelectedOption>()
+                .HasOne(pso => pso.AnswerOption) // Svaki unos ima jednu opciju odgovora
+                .WithMany() // AnswerOption nema direktnu listu ovih unosa
+                .HasForeignKey(pso => pso.AnswerOptionId)
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            modelBuilder.Entity<ParticipantSelectedOption>()
+                .HasOne(pso => pso.ParticipantAnswer)
+                .WithMany(pa => pa.SelectedOptions)
+                .HasForeignKey(pso => pso.ParticipantAnswerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<GameRoom>()
+               .HasOne(gr => gr.Quiz)
+               .WithMany() // Pošto Quiz nema direktnu listu GameRoom-ova
+               .HasForeignKey(gr => gr.QuizId)
+               .OnDelete(DeleteBehavior.Restrict);
         }
 
 
@@ -57,6 +78,10 @@ namespace KvizHub.Api.Data
         public DbSet<QuizResult> QuizResults { get; set; }
         public DbSet<UserAnswer> UserAnswers { get; set; }
         public DbSet<UserAnswerSelectedOption> UserAnswerSelectedOptions { get; set; }
+        public DbSet<GameRoom> GameRooms { get; set; }
+        public DbSet<LiveQuizParticipant> LiveQuizParticipants { get; set; }
+        public DbSet<ParticipantAnswer> ParticipantAnswers { get; set; }
+        public DbSet<ParticipantSelectedOption> ParticipantSelectedOptions { get; set; }
 
     }
 }

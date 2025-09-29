@@ -8,7 +8,8 @@ namespace KvizHub.Api.Services.Quizzes
 {
     public interface IQuizService
     {
-        Task<IEnumerable<QuizListDto>> GetQuizzesAsync();
+        Task<IEnumerable<QuizListDto>> GetSoloQuizzesAsync();
+        Task<IEnumerable<QuizListDto>> GetLiveQuizzesAsync();
         Task<QuizDto?> GetQuizByIdAsync(int quizId);
         Task<QuizForTakerDto> GetQuizForTakerAsync(int quizId);
         Task<QuizDto> CreateQuiz(CreateQuizWithQuestionsDto dto);

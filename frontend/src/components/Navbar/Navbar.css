@@ -1,5 +1,5 @@
 .navbar {
-  max-width: 900px;
+  max-width: 1100px;
   margin: 2rem auto;
   border-radius: 9999px; 
   box-shadow: var(--box-shadow);
@@ -111,3 +111,19 @@
   color: var(--danger-hover);
 }
 
+.navbar-link-button {
+  background: var(--navbar-text);
+  color: var(--foreground);
+  font-family: inherit;
+  font-size: inherit;
+  padding: 14px 16px;
+  text-decoration: none;
+    border-radius: 9999px; /* Da slika bude okrugla */
+    cursor: pointer;
+    border: 2px solid var(--button-color);
+}
+
+.navbar-link-button:hover { 
+  background: var(--button-color);
+  font-weight: bold;
+}

@@ -26,6 +26,7 @@ namespace KvizHub.Api.Services.Question
                     PointNum = q.PointNum,
                     Type = q.Type.ToString(),
                     CorrectTextAnswer = q.CorrectTextAnswer,
+                    TimeLimitSeconds = q.TimeLimitSeconds,
                     AnswerOptions = q.AnswerOptions.Select(ao => new AnswerOptionDto
                     {
                         AnswerOptionID = ao.AnswerOptionID,
@@ -50,7 +51,8 @@ namespace KvizHub.Api.Services.Question
                 QuestionText = dto.QuestionText,
                 PointNum = dto.PointNum,
                 Type = dto.Type,
-                CorrectTextAnswer = dto.CorrectTextAnswer ?? string.Empty
+                CorrectTextAnswer = dto.CorrectTextAnswer ?? string.Empty,
+                TimeLimitSeconds = dto.TimeLimitSeconds
             };
 
             foreach (var answerDto in dto.AnswerOptions)
@@ -72,6 +74,7 @@ namespace KvizHub.Api.Services.Question
                 PointNum = newQuestion.PointNum,
                 Type = newQuestion.Type.ToString(),
                 CorrectTextAnswer = newQuestion.CorrectTextAnswer,
+                TimeLimitSeconds = newQuestion.TimeLimitSeconds,
                 AnswerOptions = newQuestion.AnswerOptions.Select(ao => new AnswerOptionDto
                 {
                     AnswerOptionID = ao.AnswerOptionID,

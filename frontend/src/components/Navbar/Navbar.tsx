@@ -3,7 +3,11 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import './Navbar.css';
 
-const Navbar = () => {
+interface NavbarProps {
+  onOpenJoinModal: () => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
   const { user, logout } = useAuth();
   const [isDropdownOpen, setDropdownOpen] = useState(false);
 
@@ -28,6 +32,9 @@ const fullProfilePictureUrl = user && user.profilePictureUrl ? `${process.env.RE
         <Link to="/kvizovi" className="navbar-links">Kvizovi</Link>
         <Link to="/moji-rezultati" className="navbar-links">Moji rezultati</Link>
         <Link to="/rang-lista" className="navbar-links">Rang Lista</Link>
+        <button onClick={onOpenJoinModal} className="navbar-link-button">
+          Pridruži se Areni
+        </button>
         {user.role === 'Admin' && (
           <Link to="/dashboard" className="navbar-links">Dashboard</Link>
         )}

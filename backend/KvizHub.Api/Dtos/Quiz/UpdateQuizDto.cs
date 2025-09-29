@@ -17,6 +17,7 @@ namespace KvizHub.Api.Dtos.Quiz
         [Required]
         [MinLength(1)]
         public List<int> CategoryIds { get; set; } = new();
+        public QuizMode Mode { get; set; }
         public List<UpdateQuestionDto> Questions { get; set; } = new();
     }
 }

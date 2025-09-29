@@ -10,6 +10,7 @@ namespace KvizHub.Api.Dtos.Quiz
         public string Description { get; set; } = string.Empty;
         public string Difficulty { get; set; } = string.Empty;
         public int TimeLimit { get; set; }
+        public string Mode { get; set; } = string.Empty;
         public List<CategoryDto> Categories { get; set; } = new();
     }
 }

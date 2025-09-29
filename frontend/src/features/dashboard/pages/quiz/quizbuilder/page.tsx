@@ -11,11 +11,16 @@ const emptyQuestion = {
   type: 0, 
   pointNum: 1,
   correctTextAnswer: '',
+  timeLimitSeconds: null, 
   answerOptions: [{ text: '', isCorrect: false }, { text: '', isCorrect: false }] 
 };
 
-const QuizBuilderPage = () => {
-  const { quizId } = useParams<{ quizId: string }>();
+interface QuizBuilderPageProps {
+  mode?: 'solo' | 'live';
+}
+
+const QuizBuilderPage: React.FC<QuizBuilderPageProps> = ({ mode }) => {
+  const { quizId } = useParams<{ quizId?: string }>();
   const navigate = useNavigate();
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -29,8 +34,13 @@ const QuizBuilderPage = () => {
     };
 
   const isEditMode = !!quizId;
+  const creationMode = isEditMode ? undefined : mode;
 
-  const [quizDetails, setQuizDetails] = useState({ name: '', description: '', difficulty: 0, timeLimit: 300, categoryIds: [] });
+ const [quizDetails, setQuizDetails] = useState({ 
+      name: '', description: '', difficulty: 0, timeLimit: 300, 
+      mode: creationMode === 'live' ? 1 : 0,
+      categoryIds: [] 
+  });  
   const [questions, setQuestions] = useState(() => [
       {
           ...emptyQuestion,
@@ -57,6 +67,7 @@ const QuizBuilderPage = () => {
           description: quizData.description,
           difficulty: quizData.difficulty === "Easy" ? 0 : quizData.difficulty === "Medium" ? 1 : 2,
           timeLimit: quizData.timeLimit,
+          mode: quizData.mode === "Live" ? 1 : 0,
           categoryIds: quizData.categories.map((c: any) => ({ 
             value: c.categoryID, 
             label: c.name 
@@ -200,12 +211,26 @@ const QuizBuilderPage = () => {
       }
     }
 
+    const currentMode = isEditMode ? (quizDetails.mode === 1 ? 'live' : 'solo') : creationMode;
+
+    if (currentMode === 'live') {
+        for (let i = 0; i < questions.length; i++) {
+        const q = questions[i];
+        if (!q.timeLimitSeconds || q.timeLimitSeconds <= 0) {
+          setError(`Pitanje #${i + 1} mora imati definisano vreme za odgovor u live modu.`);
+          return;
+        }
+      }
+    }
+
     const cleanedQuestions = questions.map(q => {
         if (q.type === 3) {
             return { ...q, answerOptions: [] };
         }
         return q;
     });
+
+    const redirectPath = currentMode === 'live' ? '/dashboard/live-kvizovi' : '/dashboard/kvizovi';
 
     const finalDto = {
       ...quizDetails,
@@ -218,11 +243,10 @@ const QuizBuilderPage = () => {
     try {
       if (isEditMode && quizId) {
         await quizService.updateQuiz(parseInt(quizId), finalDto);
-        navigate(`/dashboard/kvizovi/`);
       } else {
         await quizService.createQuizWithQuestions(finalDto);
-            navigate(`/dashboard/kvizovi/`);
       }
+      navigate(redirectPath);
     } catch (error: any) {
       if (isEditMode && quizId && error.response && error.response.status === 409) {
             setConfirmModalMessage(error.response.data.message);
@@ -266,11 +290,16 @@ const QuizBuilderPage = () => {
     <>
     <form onSubmit={(e) => { e.preventDefault(); handleSaveAll(); }} className="form-page-container">
       
-      <h2>{isEditMode ? `Uređivanje Kviza: ${quizDetails.name}` : 'Kreiraj Novi Kviz'}</h2>
+      <h2>
+        {isEditMode 
+          ? `Uređivanje Kviza: ${quizDetails.name}` 
+          : (creationMode === 'live' ? 'Kreiraj Novi Kviz Uzivo' : 'Kreiraj Novi Kviz')}
+      </h2>
 
       <QuizForm 
         quizData={quizDetails} 
-        onDataChange={handleQuizDetailsChange} 
+        onDataChange={handleQuizDetailsChange}
+        mode={isEditMode ? (quizDetails.mode === 1 ? 'live' : 'solo') : creationMode}
       />
 
       <hr className="section-divider" />
@@ -285,6 +314,7 @@ const QuizBuilderPage = () => {
             onDataChange={handleQuestionChange}
             onRemove={removeQuestionForm}
             onAddOption={() => handleAddAnswerOption(index)}
+            mode={isEditMode ? (quizDetails.mode === 1 ? 'live' : 'solo') : creationMode}
           />
         ))}
       </div>
@@ -313,10 +343,9 @@ const QuizBuilderPage = () => {
       </div>
     </form>
 
-<Modal isOpen={isConfirmModalOpen} onClose={handleCancelArchive}>
+      <Modal isOpen={isConfirmModalOpen} onClose={handleCancelArchive}>
         <div className="confirmation-modal">
             <h3>Potvrda izmene</h3>
-            {/* Prikazujemo poruku sa servera */}
             <p>{confirmModalMessage}</p> 
             <div className="modal-actions">
                 <button type="button" onClick={handleCancelArchive} className="btn-secondary btn">

@@ -15,6 +15,9 @@ const Sidebar = () => {
         <NavLink to="/dashboard/kvizovi" className="sidebar-link">
           <span>Upravljaj kvizovima</span>
         </NavLink>
+        <NavLink to="/dashboard/live-kvizovi" className="sidebar-link">
+          <span>Upravljaj kvizovima uzivo</span>
+        </NavLink>
         <NavLink to="/dashboard/kategorije" className="sidebar-link">
           <span>Upravljaj kategorijama</span>
         </NavLink>
