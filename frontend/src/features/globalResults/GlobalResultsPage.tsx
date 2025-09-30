@@ -1,9 +1,11 @@
 import React, { useState,useMemo } from 'react';
 import GlobalRankingTab from './components/GlobalRankingTab';
 import PerQuizRankingsTab from './components/PerQuizRankingsTab';
+import LiveGlobalRankingTab from './components/LiveGlobalRankingTab';
+import ArenaHistoryTab from './components/ArenaHistoryTab';
 import './GlobalResultsPage.css';
 
-type Tab = 'global' | 'perQuiz';
+type Tab = 'globalStandard' | 'globalLive' | 'perQuiz' | 'arenaHistory';
 export type TimePeriod = 'week' | 'month' | 'all';
 
 const formatDate = (date: Date) => {
@@ -12,7 +14,7 @@ const formatDate = (date: Date) => {
 
 
 const GlobalResultsPage: React.FC = () => {
-    const [activeTab, setActiveTab] = useState<Tab>('global');
+    const [activeTab, setActiveTab] = useState<Tab>('globalStandard');
     const [timePeriod, setTimePeriod] = useState<TimePeriod>('all');
 
     const dates = useMemo(() => {
@@ -26,43 +28,64 @@ const GlobalResultsPage: React.FC = () => {
         }
 
         return {
-            // Vraćamo null ako je izabrano "Sve vreme"
             startDate: timePeriod !== 'all' ? formatDate(startDate) : undefined,
             endDate: timePeriod !== 'all' ? formatDate(endDate) : undefined
         };
     }, [timePeriod]);
 
+    const renderActiveTab = () => {
+        switch(activeTab) {
+            case 'globalStandard':
+                return <GlobalRankingTab startDate={dates.startDate} endDate={dates.endDate} />;
+            case 'globalLive':
+                return <LiveGlobalRankingTab startDate={dates.startDate} endDate={dates.endDate} />;
+            case 'perQuiz':
+                return <PerQuizRankingsTab startDate={dates.startDate} endDate={dates.endDate} />;
+            case 'arenaHistory':
+                return <ArenaHistoryTab />;
+            default:
+                return null;
+        }
+    }
+
   return (
         <div className="ranking-page-container">
             <h1>Rang Lista</h1>
-
-            <div className="time-period-filter">
-                <button 
-                    className={timePeriod === 'week' ? 'active' : ''}
-                    onClick={() => setTimePeriod('week')}
-                >
-                    Poslednjih 7 dana
-                </button>
-                <button 
-                    className={timePeriod === 'month' ? 'active' : ''}
-                    onClick={() => setTimePeriod('month')}
-                >
-                    Poslednjih 30 dana
-                </button>
-                <button 
-                    className={timePeriod === 'all' ? 'active' : ''}
-                    onClick={() => setTimePeriod('all')}
-                >
-                    Sve vreme
-                </button>
-            </div>
+            {activeTab !== 'arenaHistory' && (
+                <div className="time-period-filter">
+                    <button 
+                        className={timePeriod === 'week' ? 'active' : ''}
+                        onClick={() => setTimePeriod('week')}
+                    >
+                        Poslednjih 7 dana
+                    </button>
+                    <button 
+                        className={timePeriod === 'month' ? 'active' : ''}
+                        onClick={() => setTimePeriod('month')}
+                    >
+                        Poslednjih 30 dana
+                    </button>
+                    <button 
+                        className={timePeriod === 'all' ? 'active' : ''}
+                        onClick={() => setTimePeriod('all')}
+                    >
+                        Sve vreme
+                    </button>
+                </div>
+            )}
             
             <div className="tabs-container">
                 <button 
-                    className={`tab-button ${activeTab === 'global' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('global')}
+                    className={`tab-button ${activeTab === 'globalStandard' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('globalStandard')}
                 >
                     Globalna Rang Lista
+                </button>
+                <button 
+                    className={`tab-button ${activeTab === 'globalLive' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('globalLive')}
+                >
+                    Globalni Rang (Live)
                 </button>
                 <button 
                     className={`tab-button ${activeTab === 'perQuiz' ? 'active' : ''}`}
@@ -70,13 +93,16 @@ const GlobalResultsPage: React.FC = () => {
                 >
                     Rezultati po Kvizovima
                 </button>
+                <button 
+                    className={`tab-button ${activeTab === 'arenaHistory' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('arenaHistory')}
+                >
+                    Istorija Arena
+                </button>
             </div>
 
             <div className="tab-content">
-                {activeTab === 'global' ? 
-                    <GlobalRankingTab startDate={dates.startDate} endDate={dates.endDate} /> : 
-                    <PerQuizRankingsTab startDate={dates.startDate} endDate={dates.endDate} />
-                }
+                {renderActiveTab()}
             </div>
         </div>
     );

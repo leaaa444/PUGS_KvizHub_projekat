@@ -65,6 +65,7 @@ namespace KvizHub.Api.Services.LiveQuiz
             var context = scope.ServiceProvider.GetRequiredService<KvizHubContext>();
 
             var room = await context.GameRooms
+                .Include(r => r.Quiz)
                 .Include(r => r.Participants).ThenInclude(p => p.User)
                 .FirstOrDefaultAsync(r => r.RoomCode == roomCode);
 
@@ -94,6 +95,7 @@ namespace KvizHub.Api.Services.LiveQuiz
             await context.SaveChangesAsync();
 
             var finalRoomState = await context.GameRooms
+                .Include(r => r.Quiz)
                 .Include(r => r.Participants).ThenInclude(p => p.User)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(r => r.RoomCode == roomCode);
@@ -120,7 +122,6 @@ namespace KvizHub.Api.Services.LiveQuiz
 
         public async Task SubmitAnswerAsync(SubmitAnswerDto answerDto, string userIdStr, string connectionId)
         {
-            // Koristimo 'using' blok da bismo osigurali da se DbContext pravilno oslobodi
             using var scope = _scopeFactory.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<KvizHubContext>();
 
@@ -128,8 +129,8 @@ namespace KvizHub.Api.Services.LiveQuiz
 
             try
             {
-                // 1. Validacija i pronalaženje potrebnih podataka
                 var room = await context.GameRooms
+                    .Include(r => r.Quiz)
                     .Include(r => r.Participants)
                     .FirstOrDefaultAsync(r => r.RoomCode == answerDto.RoomCode && r.Status == GameStatus.InProgress);
 
@@ -152,7 +153,7 @@ namespace KvizHub.Api.Services.LiveQuiz
                 if (hasAlreadyAnswered)
                 {
                     _logger.LogWarning($"SubmitAnswer: Učesnik {participant.Id} je već odgovorio na pitanje {answerDto.QuestionId}.");
-                    return; // Ne radimo ništa ako je već odgovorio
+                    return; 
                 }
 
                 var question = await context.Questions
@@ -166,7 +167,6 @@ namespace KvizHub.Api.Services.LiveQuiz
                     return;
                 }
 
-                // 2. Računanje poena (logika je ista kao pre)
                 var timeTaken = DateTime.UtcNow - room.CurrentQuestionStartTime.Value;
                 bool isCorrect = IsLiveAnswerCorrect(question, answerDto.SelectedOptionIds ?? new List<int>(), answerDto.TextAnswer);
                 int pointsAwarded = 0;
@@ -211,12 +211,9 @@ namespace KvizHub.Api.Services.LiveQuiz
 
                 _logger.LogInformation($"[LiveGameManager] Odgovor sačuvan za učesnika {participant.Id}. Novi skor: {participant.Score}.");
 
-                // 4. Slanje ažuriranog stanja svim klijentima u sobi
                 var updatedRoomForDto = await context.GameRooms.Include(r => r.Participants).ThenInclude(p => p.User).FirstAsync(r => r.Id == room.Id);
-                // Ovde koristimo _hubContext umesto 'Clients'
                 await _hubContext.Clients.Group(answerDto.RoomCode).SendAsync("UpdateRoom", MapRoomToDto(updatedRoomForDto));
 
-                // 5. Provera da li su svi odgovorili i prelazak na sledeće pitanje
                 var totalParticipants = room.Participants.Count(p => p.User.Username != room.HostUsername);
                 var answersForThisQuestion = await context.ParticipantAnswers.CountAsync(pa => pa.QuestionId == answerDto.QuestionId && room.Participants.Select(p => p.Id).Contains(pa.ParticipantId));
 
@@ -224,13 +221,12 @@ namespace KvizHub.Api.Services.LiveQuiz
                 {
                     _logger.LogInformation($"[LiveGameManager] Svi su odgovorili u sobi {room.RoomCode}. Prelazim na sledeće pitanje.");
                     CancelQuestionTimer(room.RoomCode);
-                    await AdvanceToNextQuestion(room.Id); // Pozivamo privatnu metodu unutar servisa
+                    await AdvanceToNextQuestion(room.Id);
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "FATALNA GREŠKA U SubmitAnswerAsync metodi!");
-                // Šaljemo grešku samo korisniku koji je poslao odgovor
                 await _hubContext.Clients.Client(connectionId).SendAsync("Error", "Došlo je do greške prilikom slanja odgovora.");
             }
         }
@@ -253,6 +249,7 @@ namespace KvizHub.Api.Services.LiveQuiz
 
             var room = await context.GameRooms
                 .Include(r => r.Participants).ThenInclude(p => p.User)
+                .Include(r => r.Quiz)
                 .FirstOrDefaultAsync(r => r.HostUsername == username || r.Participants.Any(p => p.User.Username == username));
 
             if (room == null || room.Status == GameStatus.Finished) return;
@@ -319,14 +316,12 @@ namespace KvizHub.Api.Services.LiveQuiz
 
         private async Task AdvanceToNextQuestion(int roomId)
         {
-            // Koristimo scope factory jer se ova metoda poziva iz pozadinskog procesa (tajmera)
             using var scope = _scopeFactory.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<KvizHubContext>();
 
             var roomForCode = await context.GameRooms.AsNoTracking().FirstOrDefaultAsync(r => r.Id == roomId);
             if (roomForCode == null) return;
 
-            // Zaključavamo sobu da sprečimo da dva procesa istovremeno menjaju pitanje
             if (!_advancingRooms.TryAdd(roomForCode.RoomCode, true))
             {
                 _logger.LogWarning($"[LiveGameManager] AdvanceToNextQuestion je već u toku za sobu {roomForCode.RoomCode}. Izlazim.");
@@ -344,8 +339,8 @@ namespace KvizHub.Api.Services.LiveQuiz
 
                 if (room.CurrentQuestionIndex >= room.Quiz.Questions.Count - 1)
                 {
-                    // Nema više pitanja, završavamo kviz
                     room.Status = GameStatus.Finished;
+                    room.FinishedAt = DateTime.UtcNow;
                     await context.SaveChangesAsync();
 
                     var finalRoomDto = MapRoomToDto(room);
@@ -354,7 +349,6 @@ namespace KvizHub.Api.Services.LiveQuiz
                 }
                 else
                 {
-                    // Ima još pitanja, prelazimo na sledeće
                     room.CurrentQuestionIndex++;
                     await context.SaveChangesAsync();
                     await SendQuestion(roomId);
@@ -363,7 +357,6 @@ namespace KvizHub.Api.Services.LiveQuiz
             }
             finally
             {
-                // Uvek otključavamo sobu, čak i ako dođe do greške
                 _advancingRooms.TryRemove(roomForCode.RoomCode, out _);
             }
         }
@@ -407,12 +400,13 @@ namespace KvizHub.Api.Services.LiveQuiz
             }
         }
 
-        private GameRoomDto MapRoomToDto(GameRoom room)
+        public GameRoomDto MapRoomToDto(GameRoom room)
         {
             return new GameRoomDto
             {
                 RoomCode = room.RoomCode,
                 QuizId = room.QuizId,
+                QuizName = room.Quiz?.Name ?? "Nepoznat kviz",
                 HostUsername = room.HostUsername ?? "N/A",
                 Status = room.Status.ToString(),
                 CurrentQuestionIndex = room.CurrentQuestionIndex,

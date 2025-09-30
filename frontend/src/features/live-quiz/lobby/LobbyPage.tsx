@@ -69,8 +69,9 @@ const LobbyPage = () => {
 
    return (
         <div className="lobby-container">
-        
-        {/* Zaglavlje sa kodom sobe */}
+        <div className="quiz-title-header">
+            <h2>{room.quizName || 'Učitavanje naziva kviza...'}</h2>
+        </div>
         <div className="lobby-header">
             <h3>Kod Sobe:</h3>
             <div className="room-code-wrapper">

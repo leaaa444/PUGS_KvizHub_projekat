@@ -116,7 +116,7 @@ namespace KvizHub.Api.Controllers
             {
                 return NotFound(new { message = ex.Message });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return StatusCode(500, "Došlo je do interne greške prilikom obrade kviza.");
             }

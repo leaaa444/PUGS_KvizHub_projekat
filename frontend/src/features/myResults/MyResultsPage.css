@@ -138,7 +138,7 @@
     flex-direction: column; /* Ređamo elemente vertikalno */
     align-items: center; /* Centriramo sve horizontalno */
     gap: 0.75rem; /* Standardizovan razmak između svih elemenata u zaglavlju */
-    color: var(--modal-text);
+    color: var(--text-color);
 }
 
 .modal-result-header h2 {
@@ -170,6 +170,8 @@
     gap: 0.5rem;
     flex-wrap: wrap;
     justify-content: center;
+    color: var(--text-color);
+
 }
 
 /* Stil za Difficulty bedž unutar modala */
@@ -192,6 +194,8 @@
     color: var(--modal-text);
     padding: 4px 10px;
     border-radius: 5px;
+    color: var(--text-color);
+
 }
 
 .modal-time-taken {
@@ -286,7 +290,7 @@
 }
 
 
-/* === Stilizovan Scrollbar (Bonus) === */
+/* === Stilizovan Scrollbar === */
 .questions-list::-webkit-scrollbar {
     width: 8px;
 }

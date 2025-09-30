@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../Modal/Modal';
-// Više nam ne treba ništa iz signalrService-a ovde
+import './JoinArenaModal.css'
 
 interface JoinArenaModalProps {
     isOpen: boolean;
@@ -11,9 +11,7 @@ interface JoinArenaModalProps {
 const JoinArenaModal: React.FC<JoinArenaModalProps> = ({ isOpen, onClose }) => {
     const navigate = useNavigate();
     const [roomCode, setRoomCode] = useState('');
-    const [error, setError] = useState(''); // Možemo ostaviti za neku buduću validaciju
-
-    // Resetuj polje kada se modal otvori
+    const [error, setError] = useState(''); 
     useEffect(() => {
         if (isOpen) {
             setRoomCode('');
@@ -24,7 +22,6 @@ const JoinArenaModal: React.FC<JoinArenaModalProps> = ({ isOpen, onClose }) => {
     const handleJoin = (e: React.FormEvent) => {
         e.preventDefault();
         
-        // Jednostavna provera da li je kod unet
         if (!roomCode.trim()) {
             setError('Morate uneti kod sobe.');
             return;
@@ -32,33 +29,31 @@ const JoinArenaModal: React.FC<JoinArenaModalProps> = ({ isOpen, onClose }) => {
 
         const formattedRoomCode = roomCode.trim().toUpperCase();
         
-        // 1. Zatvori modal
         onClose();
         
-        // 2. Samo navigiraj na Lobby stranicu sa unetim kodom
         navigate(`/live-arena/lobby/${formattedRoomCode}`);
     };
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
-            <div>
-                <h2>Pridruži se Areni</h2>
-                <form onSubmit={handleJoin}>
-                    {/* Polje za username nam više ne treba */}
-                    <input
-                        type="text"
-                        value={roomCode}
-                        onChange={e => setRoomCode(e.target.value)}
-                        placeholder="Unesi kod sobe"
-                        autoFocus
-                        required
-                        maxLength={5} // Kod je 5 karaktera
-                    />
-                    <button type="submit">Pridruži se</button>
-                    {error && <p style={{ color: 'red' }}>{error}</p>}
-                </form>
-            </div>
-        </Modal>
+        <div className="join-arena-content">
+            <h2>Pridruži se Areni</h2>
+            <form onSubmit={handleJoin} className="join-arena-form">
+                <input
+                    type="text"
+                    value={roomCode}
+                    onChange={e => setRoomCode(e.target.value)}
+                    placeholder="Unesi kod sobe"
+                    autoFocus
+                    required
+                    maxLength={5} 
+                    className="join-arena-input"
+                />
+                <button type="submit" className="join-arena-button">Pridruži se</button>
+                <p className="join-arena-error">{error || ' '}</p>
+            </form>
+        </div>
+    </Modal>
     );
 };
 

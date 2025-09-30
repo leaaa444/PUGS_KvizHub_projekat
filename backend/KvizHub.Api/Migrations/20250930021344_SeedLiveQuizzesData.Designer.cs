@@ -4,6 +4,7 @@ using KvizHub.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KvizHub.Api.Migrations
 {
     [DbContext(typeof(KvizHubContext))]
-    partial class KvizHubContextModelSnapshot : ModelSnapshot
+    [Migration("20250930021344_SeedLiveQuizzesData")]
+    partial class SeedLiveQuizzesData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -154,143 +157,17 @@ namespace KvizHub.Api.Migrations
                         },
                         new
                         {
-                            AnswerOptionID = 204,
-                            IsCorrect = false,
-                            QuestionID = 79,
-                            Text = "Grčka"
-                        },
-                        new
-                        {
-                            AnswerOptionID = 205,
-                            IsCorrect = true,
-                            QuestionID = 81,
-                            Text = "Tačno"
-                        },
-                        new
-                        {
-                            AnswerOptionID = 206,
-                            IsCorrect = false,
-                            QuestionID = 81,
-                            Text = "Netačno"
-                        },
-                        new
-                        {
-                            AnswerOptionID = 207,
-                            IsCorrect = true,
-                            QuestionID = 82,
-                            Text = "Brazil"
-                        },
-                        new
-                        {
-                            AnswerOptionID = 208,
-                            IsCorrect = false,
-                            QuestionID = 82,
-                            Text = "Meksiko"
-                        },
-                        new
-                        {
-                            AnswerOptionID = 209,
-                            IsCorrect = true,
-                            QuestionID = 82,
-                            Text = "Argentina"
-                        },
-                        new
-                        {
                             AnswerOptionID = 210,
-                            IsCorrect = false,
-                            QuestionID = 83,
-                            Text = "Egipat"
+                            IsCorrect = true,
+                            QuestionID = 85,
+                            Text = "Tačno"
                         },
                         new
                         {
                             AnswerOptionID = 211,
-                            IsCorrect = true,
-                            QuestionID = 83,
-                            Text = "Jordan"
-                        },
-                        new
-                        {
-                            AnswerOptionID = 212,
-                            IsCorrect = true,
-                            QuestionID = 85,
-                            Text = "Tačno"
-                        },
-                        new
-                        {
-                            AnswerOptionID = 213,
                             IsCorrect = false,
                             QuestionID = 85,
                             Text = "Netačno"
-                        },
-                        new
-                        {
-                            AnswerOptionID = 215,
-                            IsCorrect = false,
-                            QuestionID = 87,
-                            Text = "Do Not Repeat Yourself"
-                        },
-                        new
-                        {
-                            AnswerOptionID = 216,
-                            IsCorrect = true,
-                            QuestionID = 87,
-                            Text = "Don't Repeat Yourself"
-                        },
-                        new
-                        {
-                            AnswerOptionID = 217,
-                            IsCorrect = false,
-                            QuestionID = 87,
-                            Text = "Drive Route Yellow"
-                        },
-                        new
-                        {
-                            AnswerOptionID = 218,
-                            IsCorrect = true,
-                            QuestionID = 88,
-                            Text = "GET"
-                        },
-                        new
-                        {
-                            AnswerOptionID = 219,
-                            IsCorrect = true,
-                            QuestionID = 88,
-                            Text = "POST"
-                        },
-                        new
-                        {
-                            AnswerOptionID = 220,
-                            IsCorrect = false,
-                            QuestionID = 88,
-                            Text = "FETCH"
-                        },
-                        new
-                        {
-                            AnswerOptionID = 221,
-                            IsCorrect = true,
-                            QuestionID = 88,
-                            Text = "PUT"
-                        },
-                        new
-                        {
-                            AnswerOptionID = 222,
-                            IsCorrect = false,
-                            QuestionID = 89,
-                            Text = "FirstOrDefault()"
-                        },
-                        new
-                        {
-                            AnswerOptionID = 223,
-                            IsCorrect = true,
-                            QuestionID = 89,
-                            Text = "AsNoTracking()"
-                        },
-                        new
-                        {
-                            AnswerOptionID = 224,
-                            IsCorrect = false,
-                            QuestionID = 89,
-                            Text = "Include()"
                         });
                 });
 
@@ -353,18 +230,6 @@ namespace KvizHub.Api.Migrations
                     b.HasIndex("QuizId");
 
                     b.ToTable("GameRooms");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1210,
-                            CurrentQuestionIndex = 0,
-                            FinishedAt = new DateTime(2025, 9, 29, 14, 30, 0, 0, DateTimeKind.Utc),
-                            HostUsername = "djordje",
-                            QuizId = 16,
-                            RoomCode = "SEED01",
-                            Status = 2
-                        });
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.LiveQuizParticipant", b =>
@@ -394,36 +259,6 @@ namespace KvizHub.Api.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("LiveQuizParticipants");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1222,
-                            GameRoomId = 1210,
-                            Score = 960,
-                            UserId = 2
-                        },
-                        new
-                        {
-                            Id = 1223,
-                            GameRoomId = 1210,
-                            Score = 610,
-                            UserId = 6
-                        },
-                        new
-                        {
-                            Id = 1224,
-                            GameRoomId = 1210,
-                            Score = 300,
-                            UserId = 7
-                        },
-                        new
-                        {
-                            Id = 1225,
-                            GameRoomId = 1210,
-                            Score = 110,
-                            UserId = 8
-                        });
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.ParticipantAnswer", b =>
@@ -460,188 +295,6 @@ namespace KvizHub.Api.Migrations
                     b.HasIndex("QuestionId");
 
                     b.ToTable("ParticipantAnswers");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 194,
-                            AnswerTimeMilliseconds = 2500,
-                            IsCorrect = true,
-                            ParticipantId = 1222,
-                            PointsAwarded = 175,
-                            QuestionId = 71,
-                            SubmittedAnswer = "Tačno"
-                        },
-                        new
-                        {
-                            Id = 195,
-                            AnswerTimeMilliseconds = 4000,
-                            IsCorrect = true,
-                            ParticipantId = 1222,
-                            PointsAwarded = 220,
-                            QuestionId = 72,
-                            SubmittedAnswer = "Mars"
-                        },
-                        new
-                        {
-                            Id = 196,
-                            AnswerTimeMilliseconds = 6000,
-                            IsCorrect = true,
-                            ParticipantId = 1222,
-                            PointsAwarded = 280,
-                            QuestionId = 73,
-                            SubmittedAnswer = "-6,-7"
-                        },
-                        new
-                        {
-                            Id = 197,
-                            AnswerTimeMilliseconds = 5000,
-                            IsCorrect = false,
-                            ParticipantId = 1222,
-                            PointsAwarded = 0,
-                            QuestionId = 74,
-                            SubmittedAnswer = "Osaka"
-                        },
-                        new
-                        {
-                            Id = 198,
-                            AnswerTimeMilliseconds = 7000,
-                            IsCorrect = true,
-                            ParticipantId = 1222,
-                            PointsAwarded = 210,
-                            QuestionId = 75,
-                            SubmittedAnswer = "-11"
-                        },
-                        new
-                        {
-                            Id = 199,
-                            AnswerTimeMilliseconds = 1500,
-                            IsCorrect = true,
-                            ParticipantId = 1222,
-                            PointsAwarded = 75,
-                            QuestionId = 76,
-                            SubmittedAnswer = "Netačno"
-                        },
-                        new
-                        {
-                            Id = 200,
-                            AnswerTimeMilliseconds = 4000,
-                            IsCorrect = true,
-                            ParticipantId = 1223,
-                            PointsAwarded = 160,
-                            QuestionId = 71,
-                            SubmittedAnswer = "Tačno"
-                        },
-                        new
-                        {
-                            Id = 201,
-                            AnswerTimeMilliseconds = 8000,
-                            IsCorrect = true,
-                            ParticipantId = 1223,
-                            PointsAwarded = 192,
-                            QuestionId = 72,
-                            SubmittedAnswer = "Mars"
-                        },
-                        new
-                        {
-                            Id = 202,
-                            AnswerTimeMilliseconds = 9000,
-                            IsCorrect = false,
-                            ParticipantId = 1223,
-                            PointsAwarded = 0,
-                            QuestionId = 73,
-                            SubmittedAnswer = "-6,-8"
-                        },
-                        new
-                        {
-                            Id = 203,
-                            AnswerTimeMilliseconds = 6000,
-                            IsCorrect = true,
-                            ParticipantId = 1223,
-                            PointsAwarded = 140,
-                            QuestionId = 74,
-                            SubmittedAnswer = "Tokio"
-                        },
-                        new
-                        {
-                            Id = 204,
-                            AnswerTimeMilliseconds = 11000,
-                            IsCorrect = true,
-                            ParticipantId = 1223,
-                            PointsAwarded = 172,
-                            QuestionId = 75,
-                            SubmittedAnswer = "-11"
-                        },
-                        new
-                        {
-                            Id = 205,
-                            AnswerTimeMilliseconds = 3000,
-                            IsCorrect = false,
-                            ParticipantId = 1223,
-                            PointsAwarded = 0,
-                            QuestionId = 76,
-                            SubmittedAnswer = "Tačno"
-                        },
-                        new
-                        {
-                            Id = 206,
-                            AnswerTimeMilliseconds = 5000,
-                            IsCorrect = false,
-                            ParticipantId = 1224,
-                            PointsAwarded = 0,
-                            QuestionId = 71,
-                            SubmittedAnswer = "Netačno"
-                        },
-                        new
-                        {
-                            Id = 207,
-                            AnswerTimeMilliseconds = 12000,
-                            IsCorrect = true,
-                            ParticipantId = 1224,
-                            PointsAwarded = 165,
-                            QuestionId = 72,
-                            SubmittedAnswer = "Mars"
-                        },
-                        new
-                        {
-                            Id = 208,
-                            AnswerTimeMilliseconds = 10000,
-                            IsCorrect = true,
-                            ParticipantId = 1224,
-                            PointsAwarded = 116,
-                            QuestionId = 74,
-                            SubmittedAnswer = "Tokio"
-                        },
-                        new
-                        {
-                            Id = 209,
-                            AnswerTimeMilliseconds = 6000,
-                            IsCorrect = false,
-                            ParticipantId = 1224,
-                            PointsAwarded = 0,
-                            QuestionId = 76,
-                            SubmittedAnswer = "Tačno"
-                        },
-                        new
-                        {
-                            Id = 210,
-                            AnswerTimeMilliseconds = 9000,
-                            IsCorrect = true,
-                            ParticipantId = 1225,
-                            PointsAwarded = 110,
-                            QuestionId = 71,
-                            SubmittedAnswer = "Tačno"
-                        },
-                        new
-                        {
-                            Id = 211,
-                            AnswerTimeMilliseconds = 14000,
-                            IsCorrect = false,
-                            ParticipantId = 1225,
-                            PointsAwarded = 0,
-                            QuestionId = 72,
-                            SubmittedAnswer = "Jupiter"
-                        });
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.ParticipantSelectedOption", b =>
@@ -657,28 +310,6 @@ namespace KvizHub.Api.Migrations
                     b.HasIndex("AnswerOptionId");
 
                     b.ToTable("ParticipantSelectedOptions");
-
-                    b.HasData(
-                        new
-                        {
-                            ParticipantAnswerId = 196,
-                            AnswerOptionId = 194
-                        },
-                        new
-                        {
-                            ParticipantAnswerId = 196,
-                            AnswerOptionId = 195
-                        },
-                        new
-                        {
-                            ParticipantAnswerId = 202,
-                            AnswerOptionId = 194
-                        },
-                        new
-                        {
-                            ParticipantAnswerId = 202,
-                            AnswerOptionId = 196
-                        });
                 });
 
             modelBuilder.Entity("KvizHub.Api.Models.Question", b =>

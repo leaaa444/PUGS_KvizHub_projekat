@@ -1,7 +1,7 @@
 import axios from 'axios';
 import authHeader from './auth-header';
 
-const API_URL = process.env.REACT_APP_API_URL + '/Results/'; // Novi URL
+const API_URL = process.env.REACT_APP_API_URL + '/Results/'; 
 
 interface QuizSubmission {
   quizId: number;
@@ -83,7 +83,6 @@ const resultService = {
   getAllRankings,
   getGlobalRanking,
   getAllAdminResults,
-
 };
 
 export default resultService;

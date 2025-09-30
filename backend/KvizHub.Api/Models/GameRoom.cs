@@ -25,6 +25,8 @@ namespace KvizHub.Api.Models
 
         public DateTime? HostDisconnectedAt { get; set; }
 
+        public DateTime? FinishedAt { get; set; }
+
         public virtual Quiz Quiz { get; set; } = null!;
 
         public virtual ICollection<LiveQuizParticipant> Participants { get; set; } = new List<LiveQuizParticipant>();

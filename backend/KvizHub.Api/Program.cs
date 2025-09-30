@@ -5,6 +5,7 @@ using KvizHub.Api.Services.Account;
 using KvizHub.Api.Services.Auth;
 using KvizHub.Api.Services.Category;
 using KvizHub.Api.Services.LiveQuiz;
+using KvizHub.Api.Services.LiveResult;
 using KvizHub.Api.Services.Question;
 using KvizHub.Api.Services.Quizzes;
 using KvizHub.Api.Services.Result;
@@ -54,6 +55,7 @@ builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<IResultService, ResultService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddSingleton<ILiveGameManager, LiveGameManager>();
+builder.Services.AddScoped<ILiveResultService, LiveResultService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

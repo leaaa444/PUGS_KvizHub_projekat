@@ -73,7 +73,7 @@
 }
 
 /* Zajednički stil za dugmiće u tabeli */
-.btn-edit, .btn-delete {
+.btn-edit, .btn-delete, .btn-start-arena {
     padding: 5px 10px;
     border-radius: var(--border-radius);
     cursor: pointer;
@@ -111,4 +111,16 @@
 .btn-delete:hover {
     background-color: var(--danger-hover);
     opacity: 0.9;
+}
+
+.btn-start-arena {
+    background-color: var(--button-color) ;
+    border-color: var(--foreground) ;
+    color: var(--foreground);
+}
+
+.btn-start-arena:hover {
+    border-color: none ;
+    background-color: var(--foreground);
+    color: var(--button-color);
 }

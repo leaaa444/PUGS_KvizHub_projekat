@@ -1,6 +1,7 @@
 export interface GameRoom {
     roomCode: string;
     quizId: number;
+    quizName?: string;
     hostUsername: string;
     status: 'Lobby' | 'InProgress' | 'Finished'; 
     players: Player[];

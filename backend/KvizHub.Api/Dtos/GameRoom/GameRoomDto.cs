@@ -6,6 +6,7 @@ namespace KvizHub.Api.Dtos.GameRoom
     {
         public string RoomCode { get; set; } = string.Empty;
         public int QuizId { get; set; }
+        public string QuizName { get; set; } = string.Empty;
         public string HostUsername { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
         public int CurrentQuestionIndex { get; set; }

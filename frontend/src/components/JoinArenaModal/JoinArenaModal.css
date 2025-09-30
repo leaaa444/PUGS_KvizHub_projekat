@@ -1,0 +1,77 @@
+/* Glavni kontejner unutar modala */
+.join-arena-content {
+  padding: 1rem 2rem 2rem 2rem;
+  text-align: center;
+  color: var(--text-color);
+}
+
+.join-arena-content h2 {
+  color: var(--background);
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+}
+
+/* Forma za unos koda */
+.join-arena-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+/* Polje za unos koda */
+.join-arena-input {
+  width: 100%;
+  max-width: 250px;
+  padding: 1rem;
+  background-color: var(--input-bg);
+  border: 1px solid var(--button-color);
+  color: var(--input-text);
+  border-radius: var(--border-radius);
+  font-size: 1.5rem;
+  text-align: center;
+  font-weight: bold;
+  letter-spacing: 4px; /* Daje izgled koda */
+  text-transform: uppercase; /* Sva slova su velika */
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.join-arena-input::placeholder {
+  color: var(--input-text-placeholder);
+  font-weight: normal;
+  letter-spacing: normal;
+  font-size: 1.1rem;
+}
+
+.join-arena-input:focus {
+  border-color: var(--background);
+  box-shadow: 0 0 0 3px rgba(90, 107, 255, 0.3); /* Prilagodi boju */
+}
+
+/* Dugme za pridruživanje */
+.join-arena-button {
+  background-color: var(--background);
+  color: var(--button-color);
+  border: none;
+  padding: 12px 40px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.1rem;
+  transition: transform 0.2s, background-color 0.2s;
+  width: 100%;
+  max-width: 250px;
+}
+
+.join-arena-button:hover {
+  transform: scale(1.05);
+}
+
+/* Poruka o grešci */
+.join-arena-error {
+  color: #e57373; /* Neka svetlija crvena boja */
+  font-weight: bold;
+  margin-top: -1rem; /* Da bude bliže polju za unos */
+  min-height: 1.2em; /* Rezerviše prostor da forma ne "skače" */
+}
